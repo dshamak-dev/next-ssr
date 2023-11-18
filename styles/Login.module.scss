@@ -1,0 +1,124 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+
+  background-color: #f2f2f2;
+
+  & .popup {
+    position: relative;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+
+    width: 100%;
+    max-width: 32rem;
+    padding: 2rem 1rem 1rem;
+    box-sizing: border-box;
+
+    & .closeButton {
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
+      height: 1rem;
+      width: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:before,
+      &:after {
+        position: absolute;
+        content: "";
+        display: block;
+        width: 1px;
+        height: 100%;
+        border-left: 3px solid black;
+      }
+      &:before {
+        transform: rotateZ(45deg);
+      }
+      &:after {
+        transform: rotateZ(135deg);
+      }
+    }
+
+    & .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    & .toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background-color: #2d2d2d;
+
+      & .toggleItem {
+        position: relative;
+        padding: 0.5rem;
+        border: 3px solid black;
+
+        &:not(:last-child) {
+          border-right: 0;
+        }
+
+        &:not(.toggleItemActive) {
+          color: rgba(255,255,255,0.3);
+        }
+        
+        &.toggleItemActive {
+          background-color: white;
+        }
+      }
+    }
+
+    & .form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+  
+      width: 100%;
+      box-sizing: border-box;
+
+      & .fields {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      & .field {
+        width: 100%;
+
+        & input {
+          all: inherit;
+          width: 100%;
+          padding: 0.5rem;
+          box-sizing: border-box;
+          border: 1px solid black;
+        }
+      }
+
+      & button {
+        width: 100%;
+        text-align: center;
+        font-size: 1rem;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        border: 1px solid black;
+        color: white;
+        background-color: black;
+      }
+    }
+  }
+}
