@@ -1,18 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import PageHead from "../../components/PageHead.js";
 import { getSession, subscribeToSession } from "../../api/session.api.js";
+import { getAPIDomain } from "../../api/api.model.js";
 
-export default function SessionPage({ id, env, defaultState }) {
+export default function SessionPage({ id, apiDomain, defaultState }) {
   const [state, setState] = useState(defaultState);
 
   const subscribe = useCallback(async () => {
     try {
-      const state = await subscribeToSession(id).then(res => res.json());
+      const state = await subscribeToSession(apiDomain, id).then((res) =>
+        res.json()
+      );
       setState(state);
 
       subscribe();
-    } catch(err) {
-      subscribe();
+    } catch (err) {
+      const canResubscribe = err.message != "Failed to fetch";
+
+      console.error(err);
+
+      if (canResubscribe) {
+        subscribe();
+      }
     }
   }, []);
 
@@ -37,25 +46,21 @@ export default function SessionPage({ id, env, defaultState }) {
 }
 
 export async function getServerSideProps(context) {
-  console.log({ context: context, env: process.env });
+  const apiDomain = getAPIDomain();
   const sessionId = context.params.id;
-
-  const env = ["API_HOST"].reduce((all, key) => {
-    return { ...all, [key]: process.env[key] };
-  }, {});
 
   let defaultState = { users: [], isAdmin: false };
 
   try {
-    defaultState = await getSession(sessionId).then(res => res.json());
-  } catch (err) {
-
-  }
+    defaultState = await getSession(apiDomain, sessionId).then((res) =>
+      res.json()
+    );
+  } catch (err) {}
 
   return {
     props: {
-      env,
       defaultState,
+      apiDomain,
       id: sessionId,
     },
   };

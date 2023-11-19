@@ -1,5 +1,5 @@
-import { API_PATH } from "./api.model.js";
+import { get } from "./api.model.js";
 
-export const getUser = async (id) => {
-  return fetch(`${API_PATH}/users/${id}`).then(res => res.json());
+export const getUser = async (domain, id) => {
+  return get(domain, `users/${id}`).then(res => res.json());
 };

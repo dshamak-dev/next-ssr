@@ -1,7 +1,13 @@
-export const API_PATH = `http://localhost:3001/api`;
+export const getAPIDomain = () => {
+  try {
+    return process.env.API_DOMAIN;
+  } catch(err) {
+    return '';
+  }
+}
 
-export const post = (path, props, body) => {
-  return fetch(`${API_PATH}${path}`, {
+export const post = (domain, path, props, body) => {
+  return fetch(`${domain}/api/${path}`, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -12,8 +18,8 @@ export const post = (path, props, body) => {
   });
 };
 
-export const get = (path, props) => {
-  return fetch(`${API_PATH}${path}`, {
+export const get = (domain, path, props) => {
+  return fetch(`${domain}/api/${path}`, {
     ...props,
   });
 };

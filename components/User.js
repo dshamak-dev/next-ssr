@@ -18,7 +18,7 @@ export default function User(props) {
 
     setBusy(true);
 
-    createSession(props.id)
+    createSession(props.apiDomain, props.id)
       .then((res) => res.json())
       .then((res) => handleNavigate(`/sessions/${res.id}`))
       .finally(() => {

@@ -1,20 +1,21 @@
 import Link from "next/link.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import styles from "../styles/Login.module.scss";
 import classNames from "classnames";
 import { useRouter } from "next/router.js";
 import PageHead from "../components/PageHead.js";
-import { getAuthToken, login } from "../api/login.api.js";
+import { login } from "../api/login.api.js";
 import { useAuth } from "../support/useAuth.js";
 import Button from "../components/Button.js";
+import { getAPIDomain } from "../api/api.model.js";
 
 const _loginTypes = [
   { value: 0, text: "User" },
   { value: 1, text: "Business" },
 ];
 
-export const Login = () => {
+export const Login = ({ apiDomain }) => {
   const router = useRouter();
   const { logged, user, setToken } = useAuth();
 
@@ -38,7 +39,7 @@ export const Login = () => {
         return { ..._fields, [key]: data.get(key) };
       }, {});
 
-      login({ ...entries, type: selectedTypeValue })
+      login(apiDomain, { ...entries, type: selectedTypeValue })
         .then((res) => {
           router.push(
             `${selectedTypeValue === 0 ? `/users/` : `/business/`}${res.id}`
@@ -134,5 +135,13 @@ export const Login = () => {
     </>
   );
 };
+
+export function getServerSideProps() {
+  return {
+    props: {
+      apiDomain: getAPIDomain()
+    }
+  }
+}
 
 export default Login;
