@@ -1,7 +1,7 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const compression = require("compression");
 const cors = require("cors");
+const os = require('os');
 
 const useUsersApi = require('./users.api');
 const useSessionApi = require('./session.api');
@@ -24,4 +24,10 @@ app.get("/health", (req, res) => {
 useUsersApi(app);
 useSessionApi(app);
 
-app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
+app.listen(PORT, () => {
+  const host = os.hostname();
+  const dir = os.homedir();
+  const platform = os.platform();
+
+  console.log({ host, dir, platform }, `Server listening on port: ${PORT}`)
+});
