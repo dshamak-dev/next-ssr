@@ -3,12 +3,12 @@ import { useCallback, useMemo, useState } from "react";
 
 import styles from "../styles/Login.module.scss";
 import classNames from "classnames";
-import { useRouter } from "next/router.js";
 import PageHead from "../components/PageHead.js";
 import { login } from "../api/login.api.js";
 import { useAuth } from "../support/useAuth.js";
 import Button from "../components/Button.js";
 import { getAPIDomain } from "../api/api.model.js";
+import { useNavigation } from "../support/useNavigation.js";
 
 const _loginTypes = [
   { value: 0, text: "User" },
@@ -16,7 +16,7 @@ const _loginTypes = [
 ];
 
 export const Login = ({ apiDomain }) => {
-  const router = useRouter();
+  const { redirect } = useNavigation();
   const { logged, user, setToken } = useAuth();
 
   const [selectedTypeValue, setSelectedTypeValue] = useState(
@@ -41,7 +41,7 @@ export const Login = ({ apiDomain }) => {
 
       login(apiDomain, { ...entries, type: selectedTypeValue })
         .then((res) => {
-          router.push(
+          redirect(
             `${selectedTypeValue === 0 ? `/users/` : `/business/`}${res.id}`
           );
         })
@@ -60,7 +60,7 @@ export const Login = ({ apiDomain }) => {
           <div>
             <Button
               onClick={() =>
-                router.push(
+                redirect(
                   `${user.type != 0 ? `/business/` : `/users/`}${user.id}`
                 )
               }

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAuthToken, setAuthToken } from "../api/login.api.js";
+import { useNavigation } from "./useNavigation.js";
 
 export const useAuth = () => {
+  const { navigate } = useNavigation();
   const [token, setToken] = useState(null);
 
   const handleSetToken = useCallback((_token) => {
@@ -37,5 +39,9 @@ export const useAuth = () => {
     setToken(getAuthToken());
   }, []);
 
-  return { logged, user, setToken: handleSetToken };
+  const login = () => {
+    navigate('/login', true);
+  };
+
+  return { logged, user, setToken: handleSetToken, login };
 };

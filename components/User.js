@@ -2,6 +2,8 @@ import { useRouter } from "next/router.js";
 import Button from "./Button.js";
 import { useCallback, useState } from "react";
 import { createSession } from "../api/session.api.js";
+import Link from "next/link.js";
+import BackButton from "./BackButton.js";
 
 export default function User(props) {
   const router = useRouter();
@@ -43,16 +45,17 @@ export default function User(props) {
         <Button onClick={handleCreateSession} disabled={busy}>create session</Button>
         <Button primary disabled={busy}>join session</Button>
       </div>
-      <div>
+      <div className="section">
         <label>History</label>
-        <div>
+        <div className="history">
           {!props.history?.length ? (
             <div>no history records</div>
           ) : (
             props.history.map((it, index) => {
               return (
-                <div key={index}>
-                  <span>{it.source}</span>
+                <div key={index} className="history_item">
+                  <Link href={`/sessions/${it.id}`}>{it.source}</Link>
+                  <span>{it.status}</span>
                   <span>{it.cost}</span>
                 </div>
               );
@@ -60,6 +63,22 @@ export default function User(props) {
           )}
         </div>
       </div>
+      <style jsx>{
+        `
+          .section, 
+          .history {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .history_item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            background-color: white;
+          }
+        `
+      }</style>
     </div>
   );
 }

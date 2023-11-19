@@ -18,10 +18,8 @@ export async function getServerSideProps({ params }) {
   const id = params?.id;
   const apiDomain = getAPIDomain();
 
-
   try {
     const user = await getUser(apiDomain, id);
-
     return {
       props: { user, apiDomain },
     };

@@ -3,7 +3,7 @@ const compression = require("compression");
 const cors = require("cors");
 const os = require('os');
 
-const useUsersApi = require('./users.api');
+const { useUserApi } = require('./users.api');
 const useSessionApi = require('./session.api');
 
 const clientPort = 3000;
@@ -21,7 +21,7 @@ app.get("/health", (req, res) => {
   res.status(200).send(true);
 });
 
-useUsersApi(app);
+useUserApi(app);
 useSessionApi(app);
 
 app.listen(PORT, () => {

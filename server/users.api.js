@@ -1,13 +1,25 @@
 const { getDB, writeDB } = require("./db.utils.js");
 
+const dbName = "clients";
+
+let _cache = getDB(dbName) || {
+  users: {},
+  business: {},
+};
+
+const updateUser = (id, data) => {
+  if (_cache.users == null) {
+    _cache.users = {};
+  }
+
+  const user = _cache.users[id] || {};
+
+  _cache.users[id] = Object.assign(user, data);
+
+  writeDB(dbName, _cache);
+}
+
 const init = (app) => {
-  const dbName = "clients";
-
-  let _cache = getDB(dbName) || {
-    users: {},
-    business: {},
-  };
-
   app.post("/api/login", async (req, res) => {
     try {
       let body = req.body;
@@ -66,4 +78,14 @@ const init = (app) => {
   });
 };
 
-module.exports = init;
+module.exports = {
+  updateUser,
+  findUserById: (id) => { 
+    if (!_cache?.users) {
+      return null;
+    }
+
+    return _cache.users[id];
+   },
+  useUserApi: init
+};
