@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const folderPath = path.join(__dirname, "../private");
+const folderPath = path.join(__dirname, "./private");
 
 const getDBPath = (dbName) => {
   return path.join(folderPath, `${dbName}.json`);
