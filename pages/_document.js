@@ -12,8 +12,8 @@ export default function PageDocument(props) {
     <Html lang="en">
       <Head>
         <link rel="icon" href="/favicon.png" sizes="any" />
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon"></link>
+        {/* <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon"></link> */}
       </Head>
       <body>
         <Main>{props.children}</Main>

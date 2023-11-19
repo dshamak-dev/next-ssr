@@ -1,26 +1,33 @@
 import User from "../../components/User.js";
-import BackButton from "../../components/BackButton.js";
+import { getUser } from "../../api/user.api.js";
+import LogoutButton from "../../components/LogoutButton.js";
+import { getAPIDomain } from "../../api/api.model.js";
 
-export default function UserPage({ user }) {
+export default function UserPage({ user, apiDomain }) {
   return (
     <div>
-      <BackButton />
       <div>
-        <User {...user} />
+        <LogoutButton />
       </div>
+      <div>{user == null ? <h2>No user data</h2> : <User {...user} apiDomain={apiDomain}  />}</div>
     </div>
   );
 }
 
 export async function getServerSideProps({ params }) {
   const id = params?.id;
+  const apiDomain = getAPIDomain();
 
-  const response = await fetch(
-    `https://jsonplaceholder.typicode.com/users/${id}`
-  );
-  const user = (await response?.json()) || null;
 
-  return {
-    props: { user },
-  };
+  try {
+    const user = await getUser(apiDomain, id);
+
+    return {
+      props: { user, apiDomain },
+    };
+  } catch (err) {
+    return {
+      props: { user: null, apiDomain },
+    };
+  }
 }
