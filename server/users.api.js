@@ -42,7 +42,7 @@ const init = (app) => {
     try {
       let body = req.body;
 
-      const { email, password, type, ...other } = body;
+      const { name, email, password, type, ...other } = body;
 
       const recordKey = type === 0 ? "users" : "business";
       const storage = _cache[recordKey];
@@ -52,7 +52,13 @@ const init = (app) => {
       const invalidData = _rec != null && _rec.password != password;
 
       if (!email || !password || invalidData) {
-        return res.status(400).end("Invalid email or password");
+        res.writeHead(400, "Invalid email or password");
+        return res.end(new Error("Invalid email or password"));
+      }
+
+      if (_rec == null && !name) {
+        res.writeHead(400, "Name should not be empty");
+        return res.end(new Error("Name should not be empty"));
       }
 
       let json = _rec;

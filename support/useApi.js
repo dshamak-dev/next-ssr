@@ -27,6 +27,7 @@ export const useApi = (request, json = false) => {
         return request(...args)
           .then((res) => {
             if (res.status >= 400) {
+              console.log({res});
               return Promise.reject(res.statusText);
             }
 
@@ -34,15 +35,19 @@ export const useApi = (request, json = false) => {
               return res.json();
             }
 
-            return Promise.resolve(res);
+            return res;
           })
           .then((res) => {
             setResponse(res);
             setLoading(false);
 
-            return res;
+            return Promise.resolve(res);
           })
-          .catch((err) => handleError(err));
+          .catch((err) => {
+            handleError(err);
+
+            return Promise.reject(err);
+          });
       } catch (err) {
         handleError(err);
 

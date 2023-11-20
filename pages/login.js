@@ -4,11 +4,12 @@ import { useCallback, useMemo, useState } from "react";
 import styles from "../styles/Login.module.scss";
 import classNames from "classnames";
 import PageHead from "../components/PageHead.js";
-import { login } from "../api/login.api.js";
+import { login, setAuthToken } from "../api/login.api.js";
 import { useAuth } from "../support/useAuth.js";
 import Button from "../components/Button.js";
 import { getAPIDomain } from "../api/api.model.js";
 import { useNavigation } from "../support/useNavigation.js";
+import { useApi } from "../support/useApi.js";
 
 const _loginTypes = [
   { value: 0, text: "User" },
@@ -18,6 +19,10 @@ const _loginTypes = [
 export const Login = ({ apiDomain }) => {
   const { redirect } = useNavigation();
   const { logged, user, setToken } = useAuth();
+  const [loading, response, error, handleLogin, reset] = useApi(
+    (body) => login(apiDomain, body),
+    true
+  );
 
   const [selectedTypeValue, setSelectedTypeValue] = useState(
     _loginTypes[0].value
@@ -51,10 +56,18 @@ export const Login = ({ apiDomain }) => {
           return { ..._fields, [key]: data.get(key) };
         }, {});
 
-      login(apiDomain, { ...entries, type: selectedTypeValue })
+      handleLogin({ ...entries, type: selectedTypeValue })
         .then((res) => {
+          console.log({ res });
+
+          const { email, type, id } = res;
+
+          setAuthToken(
+            JSON.stringify({ email, type, id, createdAt: Date.now() })
+          );
+
           redirect(
-            `${selectedTypeValue === 0 ? `/users/` : `/business/`}${res.id}`
+            `${selectedTypeValue === 0 ? `/users/` : `/business/`}${id}`
           );
         })
         .finally(() => {
@@ -152,6 +165,7 @@ export const Login = ({ apiDomain }) => {
               </div>
 
               <div className={styles.submit}>
+                {error ? <p className="error">{error}</p> : null}
                 <button disabled={busy}>
                   {isLogin ? `Log In` : `Sign Up`} as {selectedType.text}
                 </button>

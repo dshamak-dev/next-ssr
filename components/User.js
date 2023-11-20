@@ -110,7 +110,7 @@ export default function User({ apiDomain, user }) {
 
       <div className="controls">
         <a onClick={handleCreateSession}>create session</a>
-        <a primary disabled={busy} onClick={() => setShowSearch(true)}>
+        <a disabled={busy} onClick={() => setShowSearch(true)}>
           join session
         </a>
       </div>
