@@ -12,7 +12,7 @@ import { useNavigation } from "../support/useNavigation.js";
 
 export default function User({ apiDomain, user }) {
   const { navigate, router } = useNavigation();
-  const [_user, setUser] = useState(user);
+  const [_user, setUser] = useState(user || {});
   const [busy, setBusy] = useState(false);
   const [showTransaction, setShowTransaction] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -87,7 +87,7 @@ export default function User({ apiDomain, user }) {
   return (
     <div>
       <div>
-        <h3>Hello, {_user?.name || _user.email}</h3>
+        <h3>Hello, {_user.name || _user.email}</h3>
         <div>
           <h2>{_user.balance}</h2>
           <div>balance</div>

@@ -47,7 +47,7 @@ const init = (app) => {
       const recordKey = type === 0 ? "users" : "business";
       const storage = _cache[recordKey];
 
-      const _rec = Object.values(storage).find((it) => it.email === email);
+      const _rec = Object.values(storage).find((it) => it?.email === email);
 
       const invalidData = _rec != null && _rec.password != password;
 

@@ -77,7 +77,7 @@ export const Login = ({ apiDomain }) => {
                 )
               }
             >
-              continue as {user.email}
+              continue as {user?.email}
             </Button>
             <Button primary onClick={() => setToken(null)}>
               Switch Account
