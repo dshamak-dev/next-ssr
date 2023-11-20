@@ -52,13 +52,11 @@ const init = (app) => {
       const invalidData = _rec != null && _rec.password != password;
 
       if (!email || !password || invalidData) {
-        res.writeHead(400, "Invalid email or password");
-        return res.end(new Error("Invalid email or password"));
+        return res.status(400).json({ error: "Invalid email or password" });
       }
 
       if (_rec == null && !name) {
-        res.writeHead(400, "Name should not be empty");
-        return res.end(new Error("Name should not be empty"));
+        return res.status(400).json({ error: "Name should not be empty" });
       }
 
       let json = _rec;
@@ -80,7 +78,7 @@ const init = (app) => {
 
       res.status(200).json(json);
     } catch (err) {
-      res.status(400).end(err.message);
+      res.status(400).json({ error: err.message });
     }
   });
 
@@ -97,13 +95,17 @@ const init = (app) => {
       let json = Object.assign({}, _rec);
 
       const history = json.history || [];
-      const populatedHistoty = history.map((id) => ({ id, source: 'custom', status: 'pending' }));
+      const populatedHistoty = history.map((id) => ({
+        id,
+        source: "custom",
+        status: "pending",
+      }));
 
       json.history = populatedHistoty;
 
       res.status(200).json(json);
     } catch (err) {
-      res.status(400).end(err.message);
+      res.status(400).json({ error: err.message });
     }
   });
 
@@ -134,7 +136,7 @@ const init = (app) => {
 
       res.status(200).end();
     } catch (err) {
-      res.status(400).end(err.message);
+      res.status(400).end({ error: err.message });
     }
   });
 };

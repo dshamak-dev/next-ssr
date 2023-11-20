@@ -58,8 +58,6 @@ export const Login = ({ apiDomain }) => {
 
       handleLogin({ ...entries, type: selectedTypeValue })
         .then((res) => {
-          console.log({ res });
-
           const { email, type, id } = res;
 
           setAuthToken(

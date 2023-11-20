@@ -25,10 +25,13 @@ export const useApi = (request, json = false) => {
 
       try {
         return request(...args)
-          .then((res) => {
+          .then(async (res) => {
             if (res.status >= 400) {
-              console.log({res});
-              return Promise.reject(res.statusText);
+              const { error } = await (res.json
+                ? res.json()
+                : Promise.resolve({ error: res.statusText }));
+
+              return Promise.reject(error);
             }
 
             if (json) {
