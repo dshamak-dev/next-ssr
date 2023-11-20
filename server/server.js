@@ -4,7 +4,7 @@ const cors = require("cors");
 const os = require('os');
 
 const { useUserApi } = require('./users.api');
-const useSessionApi = require('./session.api');
+const { useSessionApi } = require('./session.api');
 
 const clientPort = 3000;
 

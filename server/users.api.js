@@ -19,6 +19,24 @@ const updateUser = (id, data) => {
   writeDB(dbName, _cache);
 };
 
+const findUserById = (id, keys = []) => {
+  if (!_cache?.users) {
+    return null;
+  }
+
+  const user = _cache.users[id];
+
+  if (keys != null && keys.length > 0) {
+    return keys.reduce((_all, key) => {
+      return Object.assign(_all, {
+        [key]: user[key],
+      });
+    }, {});
+  }
+
+  return user;
+};
+
 const init = (app) => {
   app.post("/api/login", async (req, res) => {
     try {
@@ -70,7 +88,12 @@ const init = (app) => {
         return res.status(404).redirect("/login");
       }
 
-      let json = _rec;
+      let json = Object.assign({}, _rec);
+
+      const history = json.history || [];
+      const populatedHistoty = history.map((id) => ({ id, source: 'custom', status: 'pending' }));
+
+      json.history = populatedHistoty;
 
       res.status(200).json(json);
     } catch (err) {
@@ -112,22 +135,6 @@ const init = (app) => {
 
 module.exports = {
   updateUser,
-  findUserById: (id, keys = null) => {
-    if (!_cache?.users) {
-      return null;
-    }
-
-    const user = _cache.users[id];
-
-    if (keys?.length) {
-      return Object.entries(user).reduce((_all, [key, value]) => {
-        return Object.assign(_all, {
-          [key]: value,
-        });
-      }, {});
-    }
-
-    return user;
-  },
+  findUserById,
   useUserApi: init,
 };

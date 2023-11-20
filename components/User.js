@@ -11,7 +11,7 @@ import { useApi } from "../support/useApi.js";
 import { useNavigation } from "../support/useNavigation.js";
 
 export default function User({ apiDomain, user }) {
-  const { navigate,  router} = useNavigation();
+  const { navigate, router } = useNavigation();
   const [_user, setUser] = useState(user);
   const [busy, setBusy] = useState(false);
   const [showTransaction, setShowTransaction] = useState(false);
@@ -27,13 +27,13 @@ export default function User({ apiDomain, user }) {
   );
 
   const handleCreateSession = useCallback(() => {
-    if (!props.id) {
+    if (!_user.id) {
       return;
     }
 
     setBusy(true);
 
-    createSession(props.apiDomain, _user.id)
+    createSession(apiDomain, _user.id)
       .then((res) => res.json())
       .then((res) => handleNavigate(`/sessions/${res.id}`))
       .finally(() => {
@@ -122,9 +122,11 @@ export default function User({ apiDomain, user }) {
             _user.history.map((it, index) => {
               return (
                 <div key={index} className="history_item">
-                  <Link href={`/sessions/${it.id}`}>{it.source}</Link>
-                  <span>{it.status}</span>
-                  <span>{it.cost}</span>
+                  <Link href={`/sessions/${it.id}`}>
+                    {it.source || "custom"}
+                  </Link>
+                  <span>{it.status || "pending"}</span>
+                  <span>{it.cost || 0}</span>
                 </div>
               );
             })

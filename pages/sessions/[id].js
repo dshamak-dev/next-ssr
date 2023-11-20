@@ -40,8 +40,6 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
       const canResubscribe = err.message != "Failed to fetch";
 
       if (canResubscribe) {
-        console.log({ canResubscribe, err });
-
         subscribe();
       } else {
         setReconnect(true);
@@ -56,8 +54,6 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
         signal: controller.signal,
       })
         .then((res) => {
-          console.log("subscribe", { res });
-
           return Promise.resolve(res);
         })
         .then((res) => res.json())

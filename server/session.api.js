@@ -9,6 +9,9 @@ const EVENT_TYPES = {
   STATE: "state",
 };
 
+const dbName = "sessions";
+let _sessions = getDB(dbName) || {};
+
 const applySessionToUser = (userId, sessionId) => {
   const user = findUserById(userId);
 
@@ -16,53 +19,86 @@ const applySessionToUser = (userId, sessionId) => {
     return;
   }
 
+  const _sessionId = String(sessionId);
   const history = user.history || [];
 
-  if (history.includes(sessionId)) {
+  if (history.includes(_sessionId)) {
     return;
   }
 
-  history.push(sessionId);
+  history.push(_sessionId);
 
   updateUser(user.id, { history });
 };
 
-const init = (app) => {
-  const dbName = "sessions";
-  let _sessions = getDB(dbName) || {};
+const findSessionById = (id, keys = []) => {
+  if (!_sessions) {
+    return null;
+  }
 
-  const onSessionChange = (sessionId, session) => {
-    emitter.emit(EVENT_TYPES.STATE, { id: sessionId, state: session });
+  const _session = _sessions[id];
 
-    _sessions = writeDB(dbName, {
-      ..._sessions,
-      [sessionId]: session,
-    });
-  };
+  if (!_session) {
+    return null;
+  }
 
-  const addSessionUser = (sessionId, userId) => {
-    const session = _sessions[sessionId];
+  if (keys != null && keys.length > 0) {
+    return keys.reduce((_all, key) => {
+      return Object.assign(_all, {
+        [key]: _session[key],
+      });
+    }, {});
+  }
 
-    if (!session) {
-      return;
-    }
+  return _session;
+};
+
+function onSessionChange(sessionId, session) {
+  emitter.emit(EVENT_TYPES.STATE, { id: sessionId, state: session });
+
+  _sessions = writeDB(dbName, {
+    ..._sessions,
+    [sessionId]: session,
+  });
+};
+
+function addSessionUser(sessionId, userId) {
+  const session = Object.assign({}, _sessions[sessionId]);
+
+  if (!session) {
+    return;
+  }
+
+  if (!session.users) {
+    session.users = [];
+  }
+
+  if (!session.users.find((it) => it.id == userId)) {
+    const userShort = findUserById(userId, ["id", "name"]);
+    const userState = {
+      ...userShort,
+      status: "pending",
+    };
+
+    session.users.push(userState);
 
     applySessionToUser(userId, sessionId);
 
-    if (!session.users) {
-      session.users = [];
-    }
+    onSessionChange(sessionId, session);
+  }
+};
 
-    if (!session.users.find((it) => it.id == userId)) {
-      session.users.push({
-        ...findUserById(userId, ["id", "name"]),
-        status: "pending",
-      });
+// const removeSessionUser = (sessionId, userId) => {
+//   const session = Object.assign({}, _sessions[sessionId]);
 
-      onSessionChange(sessionId, session);
-    }
-  };
+//   if (!session || !session.users || !session.users.length) {
+//     return;
+//   }
 
+//   onSessionChange(sessionId, session);
+// };
+
+const init = (app) => {
   app.get("/api/sessions/:sessionId", (req, res) => {
     const sessionId = req.params.sessionId;
 
@@ -81,15 +117,8 @@ const init = (app) => {
     const session = {
       ownerId,
       id: sessionId,
-      users: [
-        {
-          ...findUserById(ownerId, ["id", "name"]),
-          status: "pending",
-        },
-      ],
+      users: [],
     };
-
-    applySessionToUser(ownerId, sessionId);
 
     onSessionChange(sessionId, session);
 
@@ -125,6 +154,17 @@ const init = (app) => {
 
     res.status(200).end();
   });
+
+  app.delete("/api/sessions/:sessionId/users/:userId", (req, res) => {
+    const {sessionId, userId} = req.params.sessionId;
+
+    removeSessionUser(sessionId, userId);
+
+    res.status(200).end();
+  });
 };
 
-module.exports = init;
+module.exports = {
+  findSessionById,
+  useSessionApi: init,
+};
