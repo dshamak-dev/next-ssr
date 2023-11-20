@@ -25,7 +25,17 @@ export const Login = ({ apiDomain }) => {
   const selectedType = useMemo(() => {
     return _loginTypes.find((it) => it.value === selectedTypeValue);
   }, [selectedTypeValue]);
+
+  const [isLogin, setLoginState] = useState(true);
   const [busy, setBusy] = useState(false);
+
+  const handleToggleState = useCallback(() => {
+    if (busy) {
+      return;
+    }
+
+    setLoginState((state) => !state);
+  }, [isLogin, busy]);
 
   const handleSubmit = useCallback(
     async (ev) => {
@@ -35,9 +45,11 @@ export const Login = ({ apiDomain }) => {
       setBusy(true);
 
       const data = new FormData(ev.target);
-      const entries = ["email", "password"].reduce((_fields, key) => {
-        return { ..._fields, [key]: data.get(key) };
-      }, {});
+      const entries = ["email", "password"]
+        .concat(isLogin ? [] : ["name"])
+        .reduce((_fields, key) => {
+          return { ..._fields, [key]: data.get(key) };
+        }, {});
 
       login(apiDomain, { ...entries, type: selectedTypeValue })
         .then((res) => {
@@ -49,7 +61,7 @@ export const Login = ({ apiDomain }) => {
           setBusy(false);
         });
     },
-    [selectedTypeValue]
+    [selectedTypeValue, isLogin]
   );
 
   return (
@@ -100,6 +112,18 @@ export const Login = ({ apiDomain }) => {
               aria-disabled={busy}
             >
               <div className={styles.fields}>
+                {isLogin ? null : (
+                  <div className={styles.field}>
+                    <input
+                      required
+                      name="name"
+                      id="name"
+                      type="text"
+                      placeholder="Name"
+                      disabled={busy}
+                    />
+                  </div>
+                )}
                 <div className={styles.field}>
                   <input
                     required
@@ -121,12 +145,16 @@ export const Login = ({ apiDomain }) => {
                   />
                 </div>
                 <div>
-                  <Link href="">Don't have an account?</Link>
+                  <a onClick={handleToggleState}>
+                    {isLogin ? `Don't have an account?` : `I have an account!`}
+                  </a>
                 </div>
               </div>
 
               <div className={styles.submit}>
-                <button disabled={busy}>Log In as {selectedType.text}</button>
+                <button disabled={busy}>
+                  {isLogin ? `Log In` : `Sign Up`} as {selectedType.text}
+                </button>
               </div>
             </form>
           </div>
@@ -139,9 +167,9 @@ export const Login = ({ apiDomain }) => {
 export function getServerSideProps() {
   return {
     props: {
-      apiDomain: getAPIDomain()
-    }
-  }
+      apiDomain: getAPIDomain(),
+    },
+  };
 }
 
 export default Login;

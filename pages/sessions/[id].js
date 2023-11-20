@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import PageHead from "../../components/PageHead.js";
-import { connectSessionUser, getSession, subscribeToSession } from "../../api/session.api.js";
+import {
+  connectSessionUser,
+  getSession,
+  subscribeToSession,
+} from "../../api/session.api.js";
 import { getAPIDomain } from "../../api/api.model.js";
 import BackButton from "../../components/BackButton.js";
 import { useRecord } from "../../support/useRecord.js";
 import { useAuth } from "../../support/useAuth.js";
 import Button from "../../components/Button.js";
+import SessionUser from "../../components/SessionUser.js";
 
 export default function SessionPage({ id, apiDomain, defaultState }) {
   const { logged, user, login } = useAuth();
   const [state, setState] = useState(defaultState);
+  const [reconnect, setReconnect] = useState(false);
+
   const inSession = useMemo(() => {
     if (!logged) {
       return false;
@@ -21,9 +28,23 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
   const record = useRecord({});
 
   const subscribe = useCallback(async () => {
+    setReconnect(false);
+
     if (!record.active) {
       return;
     }
+
+    const handleError = (err) => {
+      const canResubscribe = err.message != "Failed to fetch";
+
+      if (canResubscribe) {
+        console.log({ canResubscribe, err });
+
+        subscribe();
+      } else {
+        setReconnect(true);
+      }
+    };
 
     try {
       const controller = new AbortController();
@@ -31,17 +52,23 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
 
       const state = await subscribeToSession(apiDomain, id, {
         signal: controller.signal,
-      }).then((res) => res.json());
+      })
+        .then((res) => {
+          console.log("subscribe", { res });
 
-      setState(state);
+          return Promise.resolve(res);
+        })
+        .then((res) => res.json())
+        .then((state) => {
+          setState(state);
 
-      subscribe();
+          subscribe();
+        })
+        .catch((err) => {
+          handleError(err);
+        });
     } catch (err) {
-      const canResubscribe = err.message != "Failed to fetch";
-
-      if (canResubscribe) {
-        subscribe();
-      }
+      handleError(err);
     }
 
     record.controller = null;
@@ -82,16 +109,24 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
           <p>{id}</p>
           <small>session id</small>
         </h1>
+        {reconnect ? (
+          <div>
+            <p>Opps! Connection failed.</p>
+            <Button primary onClick={() => subscribe()}>
+              Reconnect
+            </Button>
+          </div>
+        ) : null}
         <div>
           <label>Users</label>
           <div>
-            {!logged ? <Button primary onClick={() => login()}>Log In</Button> : null}
+            {!logged ? (
+              <Button primary onClick={() => login()}>
+                Log In
+              </Button>
+            ) : null}
             {state?.users?.map((id) => {
-              return (
-                <div key={id}>
-                  <span>{id}</span>
-                </div>
-              );
+              return <SessionUser key={id} session={state} id={id} />;
             })}
           </div>
         </div>

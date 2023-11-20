@@ -64,7 +64,7 @@ const init = (app) => {
     const sessionId = req.params.sessionId;
 
     if (_sessions[sessionId] == null) {
-      return res.status(404);
+      return res.status(404).json({ message: "No session found" });
     } else {
       res.json(_sessions[sessionId]);
     }
@@ -119,7 +119,7 @@ const init = (app) => {
 
     addSessionUser(sessionId, body.id);
 
-    res.status(200);
+    res.status(200).end();
   });
 };
 

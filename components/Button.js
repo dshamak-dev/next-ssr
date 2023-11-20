@@ -21,13 +21,14 @@ export default function Button({
 
   return (
     <>
-      <div
+      <button
         {...other}
         onClick={handleClick}
         className={classNames(className, "button", { primary })}
-      ></div>
+      ></button>
       <style jsx>{`
         .button {
+          width: 100%;
           padding: 0.5rem 2rem;
           background-color: transparent;
           border: 1px solid #2d2d2d;

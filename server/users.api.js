@@ -24,7 +24,7 @@ const init = (app) => {
     try {
       let body = req.body;
 
-      const { email, password, type } = body;
+      const { email, password, type, ...other } = body;
 
       const recordKey = type === 0 ? "users" : "business";
       const storage = _cache[recordKey];
@@ -43,6 +43,7 @@ const init = (app) => {
         const id = Date.now();
 
         json = storage[id] = {
+          ...other,
           id,
           type,
           email,
@@ -72,6 +73,37 @@ const init = (app) => {
       let json = _rec;
 
       res.status(200).json(json);
+    } catch (err) {
+      res.status(400).end(err.message);
+    }
+  });
+
+  app.post("/api/users/:id/transaction", async (req, res) => {
+    try {
+      let id = req.params.id;
+
+      const { value, password } = req.body;
+      const _rec = _cache.users[id];
+
+      if (_rec == null) {
+        return res.status(404).end();
+      }
+
+      if (_rec.password != password) {
+        return res.status(403).end();
+      }
+
+      let json = _rec;
+
+      const _value = Number(value) || 0;
+
+      if (_value != 0) {
+        json.balance += _value;
+
+        updateUser(id, json);
+      }
+
+      res.status(200).end();
     } catch (err) {
       res.status(400).end(err.message);
     }

@@ -9,7 +9,7 @@ export default function UserPage({ user, apiDomain }) {
       <div>
         <LogoutButton />
       </div>
-      <div>{user == null ? <h2>No user data</h2> : <User {...user} apiDomain={apiDomain}  />}</div>
+      <div>{user == null ? <h2>No user data</h2> : <User user={user} apiDomain={apiDomain}  />}</div>
     </div>
   );
 }
