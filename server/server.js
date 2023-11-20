@@ -13,7 +13,7 @@ const app = express();
 
 app.use(compression());
 
-app.use(cors({ origin: [`http://localhost:${clientPort}`, 'https://next-ssr-b7mz.vercel.app'] }));
+app.use(cors({ origin: [`http://localhost:${clientPort}`, 'https://next-ssr-b7mz-80r2nlhze-dshamak-devs-projects.vercel.app'] }));
 
 app.use(express.json());
 
