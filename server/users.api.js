@@ -17,7 +17,7 @@ const updateUser = (id, data) => {
   _cache.users[id] = Object.assign(user, data);
 
   writeDB(dbName, _cache);
-}
+};
 
 const init = (app) => {
   app.post("/api/login", async (req, res) => {
@@ -112,12 +112,22 @@ const init = (app) => {
 
 module.exports = {
   updateUser,
-  findUserById: (id) => { 
+  findUserById: (id, keys = null) => {
     if (!_cache?.users) {
       return null;
     }
 
-    return _cache.users[id];
-   },
-  useUserApi: init
+    const user = _cache.users[id];
+
+    if (keys?.length) {
+      return Object.entries(user).reduce((_all, [key, value]) => {
+        return Object.assign(_all, {
+          [key]: value,
+        });
+      }, {});
+    }
+
+    return user;
+  },
+  useUserApi: init,
 };

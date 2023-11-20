@@ -1,10 +1,14 @@
 import { useRouter } from "next/router.js";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 let prevRoute = null;
 
 export const useNavigation = () => {
   const router = useRouter();
+
+  const url = useMemo(() => {
+    return router.asPath;
+  }, [router.asPath]);
 
   const replace = useCallback((path) => {
     router.replace(path);
@@ -30,6 +34,7 @@ export const useNavigation = () => {
   }, [router]);
 
   return {
+    url,
     navigate,
     replace,
     push,

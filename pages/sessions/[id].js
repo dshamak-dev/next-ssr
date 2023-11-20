@@ -11,11 +11,13 @@ import { useRecord } from "../../support/useRecord.js";
 import { useAuth } from "../../support/useAuth.js";
 import Button from "../../components/Button.js";
 import SessionUser from "../../components/SessionUser.js";
+import { useNavigation } from "../../support/useNavigation.js";
 
 export default function SessionPage({ id, apiDomain, defaultState }) {
   const { logged, user, login } = useAuth();
   const [state, setState] = useState(defaultState);
   const [reconnect, setReconnect] = useState(false);
+  const { url } = useNavigation();
 
   const inSession = useMemo(() => {
     if (!logged) {
@@ -103,12 +105,16 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
   return (
     <>
       <PageHead />
-      <main>
+      <main className="session-page">
         <BackButton />
-        <h1>
-          <p>{id}</p>
+        <div className="session-field">
+          <h1><a target="_blank" href={url}>{id}</a></h1>
           <small>session id</small>
-        </h1>
+        </div>
+        <div className="session-field">
+          <h2>{state?.bid || 0}</h2>
+          <small>session bid</small>
+        </div>
         {reconnect ? (
           <div>
             <p>Opps! Connection failed.</p>
@@ -117,7 +123,7 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
             </Button>
           </div>
         ) : null}
-        <div>
+        <div className="users-list">
           <label>Users</label>
           <div>
             {!logged ? (
@@ -125,14 +131,39 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
                 Log In
               </Button>
             ) : null}
-            {state?.users?.map((id) => {
-              return <SessionUser key={id} session={state} id={id} />;
+            {state?.users?.map((it) => {
+              return <SessionUser key={it.id} session={state} user={it} />;
             })}
           </div>
         </div>
         {/* <div style={{ whiteSpaceCollapse: "break-spaces" }}>
           {JSON.stringify(state)}
         </div> */}
+        <style jsx>{`
+          .session-page {
+            width: 100vh;
+            box-sizing: border-box;
+            padding: 1rem;
+
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+          }
+
+          .session-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            text-align: center;
+            text-transform: uppercase;
+          }
+
+          .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+        `}</style>
       </main>
     </>
   );

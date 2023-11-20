@@ -53,8 +53,11 @@ const init = (app) => {
       session.users = [];
     }
 
-    if (!session.users.includes(userId)) {
-      session.users.push(userId);
+    if (!session.users.find((it) => it.id == userId)) {
+      session.users.push({
+        ...findUserById(userId, ["id", "name"]),
+        status: "pending",
+      });
 
       onSessionChange(sessionId, session);
     }
@@ -80,7 +83,8 @@ const init = (app) => {
       id: sessionId,
       users: [
         {
-          id: ownerId,
+          ...findUserById(ownerId, ["id", "name"]),
+          status: "pending",
         },
       ],
     };
