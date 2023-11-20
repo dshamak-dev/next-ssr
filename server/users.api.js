@@ -66,6 +66,7 @@ const init = (app) => {
 
         json = storage[id] = {
           ...other,
+          name,
           id,
           type,
           email,

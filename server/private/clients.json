@@ -1,1 +1,13 @@
-{"users":{"1700378297900":{"id":1700378297900,"type":0,"name":"dmitrysh","email":"dmitry.shamak.dev@gmail.com","password":"1209","balance":0,"history":[]},"1700405314412":{"id":1700405314412,"type":0,"name":"hell","email":"hellkitedmitry@mail.ru","password":"1209","balance":0,"history":[]},"1700409972273":{"id":1700409972273,"type":0,"name":"anonym1","email":"anonym1@mail.net","password":"1111","balance":0,"history":[]},"1700410187440":{"id":1700410187440,"type":0,"name":"anonym2","email":"anonym2@mail.net","password":"1111","balance":0,"history":["1700476661828"]},"1700441436487":{"id":1700441436487,"type":0,"name":"The Duck","email":"tduck@gm.ail","password":"1111","balance":1,"history":["1700476661828","1700478696840"]}},"business":{}}
+{
+  "users": {
+    "1700485139201": {
+      "id": 1700485139201,
+      "type": 0,
+      "name": "dmitry",
+      "email": "dmitry@m.com",
+      "password": "1111",
+      "balance": 0
+    }
+  },
+  "business": {}
+}
