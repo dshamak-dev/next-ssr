@@ -87,7 +87,7 @@ export default function User({ apiDomain, user }) {
   return (
     <div>
       <div>
-        <h3>Hello, {_user.name || _user.email}</h3>
+        <h3>Hello, {_user?.name || _user.email}</h3>
         <div>
           <h2>{_user.balance}</h2>
           <div>balance</div>

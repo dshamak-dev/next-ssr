@@ -11,8 +11,8 @@ export default function SessionUser({ session, user }) {
   return (
     <>
       <div className="session-user">
-        <span>{user.name}</span>
-        <span>{user.status || "pending"}</span>
+        <span>{user?.name}</span>
+        <span>{user?.status || "pending"}</span>
       </div>
       <style jsx>{`
         .session-user {
