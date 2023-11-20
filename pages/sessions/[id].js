@@ -137,7 +137,7 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
         </div> */}
         <style jsx>{`
           .session-page {
-            width: 100vh;
+            width: 100vw;
             box-sizing: border-box;
             padding: 1rem;
 

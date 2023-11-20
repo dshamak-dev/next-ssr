@@ -5,12 +5,31 @@ import { getAPIDomain } from "../../api/api.model.js";
 
 export default function UserPage({ user, apiDomain }) {
   return (
-    <div>
-      <div>
-        <LogoutButton />
+    <>
+      <div className="page-content">
+        <div>
+          <LogoutButton />
+        </div>
+        <div>
+          {user == null ? (
+            <h2>No user data</h2>
+          ) : (
+            <User user={user} apiDomain={apiDomain} />
+          )}
+        </div>
       </div>
-      <div>{user == null ? <h2>No user data</h2> : <User user={user} apiDomain={apiDomain}  />}</div>
-    </div>
+      <style jsx>{`
+        .page-content {
+          width: 100vw;
+          box-sizing: border-box;
+          padding: 1rem;
+
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+      `}</style>
+    </>
   );
 }
 

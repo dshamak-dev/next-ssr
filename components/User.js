@@ -85,13 +85,15 @@ export default function User({ apiDomain, user }) {
   );
 
   return (
-    <div>
-      <div>
+    <div className="group">
+      <div className="group">
         <h3>Hello, {_user.name || _user.email}</h3>
-        <div>
-          <h2>{_user.balance}</h2>
-          <div>balance</div>
-          <div>
+        <div className="group">
+          <div className="field">
+            <h2>{_user.balance}</h2>
+            <div>balance</div>
+          </div>
+          <div className="controls">
             <Button disabled={busy} onClick={() => setShowTransaction(1)}>
               add points
             </Button>
@@ -105,16 +107,17 @@ export default function User({ apiDomain, user }) {
           </div>
         </div>
       </div>
-      <div>
-        <Button onClick={handleCreateSession} disabled={busy}>
-          create session
-        </Button>
-        <Button primary disabled={busy} onClick={() => setShowSearch(true)}>
+
+      <div className="controls">
+        <a onClick={handleCreateSession}>create session</a>
+        <a primary disabled={busy} onClick={() => setShowSearch(true)}>
           join session
-        </Button>
+        </a>
       </div>
+
       <div className="section">
         <label>History</label>
+
         <div className="history">
           {!_user.history?.length ? (
             <div>no history records</div>
@@ -196,12 +199,26 @@ export default function User({ apiDomain, user }) {
         </div>
       </Popup>
       <style jsx>{`
-        .section,
-        .history {
+        .history,
+        .group {
           display: flex;
           flex-direction: column;
           gap: 1rem;
         }
+
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.125rem;
+          text-align: center;
+        }
+
+        .controls {
+          display: flex;
+          justify-content: space-between;
+          gap: 2rem;
+        }
+
         .history_item {
           display: flex;
           justify-content: space-between;
