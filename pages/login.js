@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import styles from "../styles/Login.module.scss";
 import classNames from "classnames";
 import PageHead from "../components/PageHead.js";
-import { login, setAuthToken } from "../api/login.api.js";
+import { login, signup, setAuthToken } from "../api/login.api.js";
 import { useAuth } from "../support/useAuth.js";
 import Button from "../components/Button.js";
 import { getAPIDomain } from "../api/api.model.js";
@@ -19,8 +19,9 @@ const _loginTypes = [
 export const Login = ({ apiDomain }) => {
   const { redirect } = useNavigation();
   const { logged, user, setToken } = useAuth();
+  const [isLogin, setLoginState] = useState(true);
   const [loading, response, error, handleLogin, reset] = useApi(
-    (body) => login(apiDomain, body),
+    (body) => isLogin ? login(apiDomain, body) : signup(apiDomain, body),
     true
   );
 
@@ -31,7 +32,6 @@ export const Login = ({ apiDomain }) => {
     return _loginTypes.find((it) => it.value === selectedTypeValue);
   }, [selectedTypeValue]);
 
-  const [isLogin, setLoginState] = useState(true);
   const [busy, setBusy] = useState(false);
 
   const handleToggleState = useCallback(() => {

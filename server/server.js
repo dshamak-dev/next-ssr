@@ -3,6 +3,8 @@ const compression = require("compression");
 const cors = require("cors");
 const os = require("os");
 
+const tables = require('./tables');
+
 const { useUserApi } = require("./users.api");
 const { useSessionApi } = require("./session.api");
 

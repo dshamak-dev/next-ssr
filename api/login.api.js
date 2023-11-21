@@ -17,3 +17,8 @@ export const setAuthToken = (user) => {
 export const login = async (domain, body) => {
   return post(domain, `login`, null, JSON.stringify(body));
 };
+
+export const signup = async (domain, body) => {
+  return post(domain, `signup`, null, JSON.stringify(body));
+};
+

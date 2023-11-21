@@ -1,13 +1,1 @@
-{
-  "users": {
-    "1700485139201": {
-      "id": 1700485139201,
-      "type": 0,
-      "name": "dmitry",
-      "email": "dmitry@m.com",
-      "password": "1111",
-      "balance": 0
-    }
-  },
-  "business": {}
-}
+[{"name":"Dmitrysh","id":"1a4bfe6d","type":0,"email":"dmitry.shamak.dev@gmail.com","password":"1111","balance":5},{"name":"User 1","id":"930c79aa","type":0,"email":"user1@m.co","password":"1111","balance":0}]

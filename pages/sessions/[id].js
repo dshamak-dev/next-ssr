@@ -121,7 +121,7 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
         ) : null}
         <div className="users-list">
           <label>Users</label>
-          <div>
+          <div className="users-list">
             {!logged ? (
               <Button primary onClick={() => login()}>
                 Log In

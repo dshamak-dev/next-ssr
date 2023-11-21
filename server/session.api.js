@@ -1,6 +1,6 @@
 const { EventEmitter } = require("events");
-const { getDB, writeDB } = require("./db.utils.js");
-const { updateUser, findUserById } = require("./users.api");
+const { clientsDB, sessionsDB } = require("./tables");
+const { uid, reduceRecord } = require("./support.js");
 
 const emitter = new EventEmitter();
 const EVENT_TYPES = {
@@ -9,118 +9,48 @@ const EVENT_TYPES = {
   STATE: "state",
 };
 
-const dbName = "sessions";
-let _sessions = getDB(dbName) || {};
-
-const applySessionToUser = (userId, sessionId) => {
-  const user = findUserById(userId);
-
-  if (user == null) {
-    return;
-  }
-
-  const _sessionId = String(sessionId);
-  const history = user.history || [];
-
-  if (history.includes(_sessionId)) {
-    return;
-  }
-
-  history.push(_sessionId);
-
-  updateUser(user.id, { history });
+const triggerSessionUpdate = (id, session) => {
+  emitter.emit(EVENT_TYPES.STATE, { id, state: session });
 };
 
-const findSessionById = (id, keys = []) => {
-  if (!_sessions) {
-    return null;
+const extendSession = (session) => {
+  if (!session || !session.users?.length) {
+    return session;
   }
 
-  const _session = _sessions[id];
+  const users = session.users.map((id) => {
+    const user = clientsDB.find({ id });
 
-  if (!_session) {
-    return null;
-  }
+    return reduceRecord(user, ["id", "email", "name"]);
+  }).filter(it => it != null);
 
-  if (keys != null && keys.length > 0) {
-    return keys.reduce((_all, key) => {
-      return Object.assign(_all, {
-        [key]: _session[key],
-      });
-    }, {});
-  }
-
-  return _session;
+  return Object.assign({}, session, { users });
 };
-
-function onSessionChange(sessionId, session) {
-  emitter.emit(EVENT_TYPES.STATE, { id: sessionId, state: session });
-
-  _sessions = writeDB(dbName, {
-    ..._sessions,
-    [sessionId]: session,
-  });
-};
-
-function addSessionUser(sessionId, userId) {
-  const session = Object.assign({}, _sessions[sessionId]);
-
-  if (!session) {
-    return;
-  }
-
-  if (!session.users) {
-    session.users = [];
-  }
-
-  if (!session.users.find((it) => it.id == userId)) {
-    const userShort = findUserById(userId, ["id", "name"]);
-    const userState = {
-      ...userShort,
-      status: "pending",
-    };
-
-    session.users.push(userState);
-
-    applySessionToUser(userId, sessionId);
-
-    onSessionChange(sessionId, session);
-  }
-};
-
-// const removeSessionUser = (sessionId, userId) => {
-//   const session = Object.assign({}, _sessions[sessionId]);
-
-//   if (!session || !session.users || !session.users.length) {
-//     return;
-//   }
-
-//   onSessionChange(sessionId, session);
-// };
 
 const init = (app) => {
   app.get("/api/sessions/:sessionId", (req, res) => {
-    const sessionId = req.params.sessionId;
+    const id = req.params.sessionId;
 
-    if (_sessions[sessionId] == null) {
-      return res.status(404).json({ message: "No session found" });
+    const session = sessionsDB.find({ id });
+    const hasMatch = session != null;
+
+    if (!hasMatch) {
+      return res.status(404).json({ error: "No session found" });
     } else {
-      res.json(_sessions[sessionId]);
+      res.json(extendSession(session));
     }
   });
 
   app.post("/api/sessions/", (req, res) => {
-    const sessionId = Date.now();
-    const body = req.body;
-    const { ownerId } = body;
+    const { ownerId } = req.body;
 
     const session = {
       ownerId,
-      id: sessionId,
+      id: uid(),
       users: [],
     };
 
-    onSessionChange(sessionId, session);
+    sessionsDB.add(session);
 
     res.status(200).json(session);
   });
@@ -137,34 +67,49 @@ const init = (app) => {
     });
   });
 
-  app.post("/api/sessions/:sessionId/state", (req, res) => {
+  app.put("/api/sessions/:sessionId", (req, res) => {
     const sessionId = req.params.sessionId;
     const body = req.body;
 
-    emitter.emit(EVENT_TYPES.STATE, { id: sessionId, state: body });
+    const session = sessionsDB.find({ id });
+    const hasMatch = session != null;
 
-    res.status(200);
-  });
+    if (!hasMatch) {
+      return res.status(404).json({ error: "No session found" });
+    }
 
-  app.post("/api/sessions/:sessionId/users", (req, res) => {
-    const sessionId = req.params.sessionId;
-    const body = req.body;
+    const _updated = sessionsDB.patch({ id }, body);
 
-    addSessionUser(sessionId, body.id);
+    triggerSessionUpdate(sessionId, _updated);
 
     res.status(200).end();
   });
 
-  app.delete("/api/sessions/:sessionId/users/:userId", (req, res) => {
-    const {sessionId, userId} = req.params.sessionId;
+  app.post("/api/sessions/:sessionId/users", (req, res) => {
+    const id = req.params.sessionId;
+    const { id: userId } = req.body;
 
-    removeSessionUser(sessionId, userId);
+    const session = sessionsDB.find({ id });
+    const hasMatch = session != null;
+
+    if (!hasMatch) {
+      return res.status(404).json({ error: "No session found" });
+    }
+
+    const sessionUsers = session.users || [];
+
+    if (!sessionUsers.includes(userId)) {
+      sessionUsers.push(userId);
+
+      const _updated = sessionsDB.patch({ id }, { users: sessionUsers });
+
+      triggerSessionUpdate(id, extendSession(_updated));
+    }
 
     res.status(200).end();
   });
 };
 
 module.exports = {
-  findSessionById,
   useSessionApi: init,
 };
