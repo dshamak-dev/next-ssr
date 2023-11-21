@@ -218,9 +218,9 @@ const init = (app) => {
 
     switch (status) {
       case "resolved": {
-        const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
+        const summary = Number(session.summary) || 0;
         const winners = users.filter(({ state }) => state);
-        const amount = sessionBid / winners.length;
+        const amount = summary / winners.length;
 
         updates[NAMINGS.results] = {
           [NAMINGS.clients]: users,
@@ -239,6 +239,8 @@ const init = (app) => {
       case "active": {
         const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
         const clients = getSessionClients(session);
+
+        updates.summary = sessionBid * clients.length;
 
         clients.forEach(({ id }) => {
           const client = clientsDB.find({ id });
