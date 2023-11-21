@@ -17,3 +17,23 @@ a {
 .error {
   color: red;
 }
+
+.flex {
+  display: flex;
+
+  &.col {
+    flex-direction: column;
+  }
+
+  &.between {
+    justify-content: space-between;
+  }
+}
+
+.gap-1 {
+  gap: 1rem;
+}
+
+.w-fit {
+  width: fit-content !important;
+}

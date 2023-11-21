@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useCallback } from "react";
 
-export default function Popup({ visible, children, onClose }) {
+export const Popup = ({ visible, children, onClose }) => {
   const handleClick = useCallback((ev) => {
     ev.stopPropagation();
   }, []);

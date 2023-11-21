@@ -2,30 +2,70 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import PageHead from "../../components/PageHead.js";
 import {
   connectSessionUser,
+  createSessionBid,
   getSession,
   subscribeToSession,
+  updateSessionState,
 } from "../../api/session.api.js";
 import { getAPIDomain } from "../../api/api.model.js";
-import BackButton from "../../components/BackButton.js";
 import { useRecord } from "../../support/useRecord.js";
 import { useAuth } from "../../support/useAuth.js";
 import Button from "../../components/Button.js";
 import SessionUser from "../../components/SessionUser.js";
 import { useNavigation } from "../../support/useNavigation.js";
+import AccountHeader from "../../components/AccountHeader.js";
+import { useApi } from "../../support/useApi.js";
+import { Popup } from "../../components/Popup.js";
+import Form from "../../components/Form.js";
+import Input from "../../components/Input.js";
 
 export default function SessionPage({ id, apiDomain, defaultState }) {
   const { logged, user, login } = useAuth();
-  const [state, setState] = useState(defaultState);
+  const [session, setState] = useState(defaultState);
   const [reconnect, setReconnect] = useState(false);
-  const { url } = useNavigation();
+  const { url, reload } = useNavigation();
+  const [bidPopupVisible, setBidPopupVisible] = useState(false);
+  const [loadingBet, bidResponse, bidError, requestBid] = useApi(
+    (body) => createSessionBid(apiDomain, id, body),
+    true
+  );
+  const [loadingSessionState, sessionState, stateError, requestStateChange] = useApi(
+    (body) => updateSessionState(apiDomain, id, body),
+    true
+  );
 
-  const inSession = useMemo(() => {
-    if (!logged) {
+  const handleBidOn = useCallback(
+    ({ value }) => {
+      requestBid({ value, id, userId: user.id }).then(() => {
+        setBidPopupVisible(false);
+      });
+    },
+    [requestBid, id, user?.id]
+  );
+
+  const handleSessionStateChange = useCallback((state) => {
+    requestStateChange({ state, userId: user.id });
+  }, [requestStateChange, user]);
+
+  const isAdmin = useMemo(() => {
+    if (!session?.ownerId || !user?.id) {
       return false;
     }
 
-    return state?.users?.find((id) => id == user.id) != null;
-  }, [logged, state]);
+    return session.ownerId === user.id;
+  }, [session, user?.id]);
+
+  const userSessionState = useMemo(() => {
+    if (!logged) {
+      return null;
+    }
+
+    return session?.users?.find(({ id }) => id == user.id);
+  }, [logged, session]);
+
+  const inSession = useMemo(() => {
+    return userSessionState != null;
+  }, [userSessionState]);
 
   const record = useRecord({});
 
@@ -50,15 +90,15 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
       const controller = new AbortController();
       record.controller = controller;
 
-      const state = await subscribeToSession(apiDomain, id, {
+      const _session = await subscribeToSession(apiDomain, id, {
         signal: controller.signal,
       })
         .then((res) => {
           return Promise.resolve(res);
         })
         .then((res) => res.json())
-        .then((state) => {
-          setState(state);
+        .then((session) => {
+          setState(session);
 
           subscribe();
         })
@@ -98,43 +138,144 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
     };
   }, []);
 
+  const sessionControls = useMemo(() => {
+    if (!isAdmin) {
+      return null;
+    }
+
+    switch (session?.status) {
+      case "pending": {
+        return <Button onClick={() => handleSessionStateChange('active')}>Lock current bid</Button>;
+      }
+      case "active": {
+        return <Button onClick={() => handleSessionStateChange('resolved')}>Resolve session</Button>;
+      }
+      default: {
+        return null;
+      }
+    }
+  }, [isAdmin, session]);
+
+  const bidControlsContent = useMemo(() => {
+    if (!logged || !inSession) {
+      return null;
+    }
+
+    if (session.status !== "pending") {
+      return <div>all bids accepted</div>;
+    }
+
+    console.log({ userSessionState });
+
+    const sessionBid = Number(session?.bid) || 0;
+    const userBid = Number(userSessionState?.bid) || 0;
+    const hasOtherBid = sessionBid !== userBid;
+
+    return (
+      <div>
+        <div className="flex between gap-1">
+          <Button primary onClick={() => setBidPopupVisible(true)}>
+            Bid On
+          </Button>
+          {hasOtherBid ? (
+            <Button
+              onClick={() => {
+                handleBidOn({ value: sessionBid });
+              }}
+            >
+              Accept current
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    );
+  }, [logged, inSession, session?.bid, userSessionState]);
+
   return (
     <>
       <PageHead />
       <main className="session-page">
-        <BackButton />
-        <div className="session-field">
-          <h1><a target="_blank" href={url}>{id}</a></h1>
-          <small>session id</small>
+        <div className="flex between">
+          <AccountHeader apiDomain={apiDomain} />
         </div>
         <div className="session-field">
-          <h2>{state?.bid || 0}</h2>
+          <h1>
+            <a target="_blank" href={url}>
+              {id}
+            </a>
+          </h1>
+          <small>session id</small>
+        </div>
+        {reconnect ? null : sessionControls}
+        <div className="session-field">
+          <h2>{session?.bid || 0}</h2>
           <small>session bid</small>
         </div>
         {reconnect ? (
           <div>
             <p>Opps! Connection failed.</p>
-            <Button primary onClick={() => subscribe()}>
+            <Button primary onClick={() => reload()}>
               Reconnect
             </Button>
           </div>
-        ) : null}
-        <div className="users-list">
-          <label>Users</label>
-          <div className="users-list">
-            {!logged ? (
-              <Button primary onClick={() => login()}>
-                Log In
-              </Button>
-            ) : null}
-            {state?.users?.map((it) => {
-              return <SessionUser key={it.id} session={state} user={it} />;
-            })}
-          </div>
-        </div>
-        {/* <div style={{ whiteSpaceCollapse: "break-spaces" }}>
-          {JSON.stringify(state)}
-        </div> */}
+        ) : (
+          <>
+            {bidControlsContent}
+          </>
+        )}
+        {reconnect ? null : (
+          <>
+            <div className="users-list">
+              <label>Users</label>
+              <div className="users-list">
+                {!logged ? (
+                  <Button primary onClick={() => login()}>
+                    Log In
+                  </Button>
+                ) : null}
+                {session?.users?.map((it) => {
+                  const isSelf = it.id === user?.id;
+                  const canKick = isAdmin && !isSelf;
+
+                  return (
+                    <SessionUser
+                      key={it.id}
+                      session={session}
+                      user={it}
+                      active={isSelf}
+                      canKick={canKick}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            <Popup
+              visible={bidPopupVisible}
+              onClose={() => setBidPopupVisible(false)}
+            >
+              <Form fields={["value"]} onSubmit={handleBidOn}>
+                <div>
+                  <Input
+                    required
+                    disabled={loadingBet}
+                    type="number"
+                    name="value"
+                    id="value"
+                    placeholder="Input Bid"
+                    defaultValue={0}
+                    step={1}
+                    min={0}
+                  />
+                </div>
+                <div>
+                  <Button primary disabled={loadingBet}>
+                    Confirm Bid
+                  </Button>
+                </div>
+              </Form>
+            </Popup>
+          </>
+        )}
         <style jsx>{`
           .session-page {
             width: 100vw;

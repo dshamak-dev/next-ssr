@@ -33,12 +33,17 @@ export const useNavigation = () => {
     navigate(path, false);
   }, [router]);
 
+  const reload = useCallback(() => {
+    router.reload();
+  }, [router]);
+
   return {
     url,
     navigate,
     replace,
     push,
     redirect,
+    reload,
     router
   };
 };

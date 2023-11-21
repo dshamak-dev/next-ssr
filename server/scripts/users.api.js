@@ -75,6 +75,23 @@ const init = (app) => {
     }
   });
 
+  app.get("/api/users/:id/balance", async (req, res) => {
+    try {
+      const id = req.params.id;
+
+      const client = clientsDB.find({ id });
+      const hasMatch = client != null;
+
+      if (!hasMatch) {
+        return res.status(404).json({ error: "No match" });
+      }
+
+      res.status(200).json({ value: client?.balance || 0 });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   app.post("/api/users/:id/transaction", async (req, res) => {
     try {
       let id = req.params.id;

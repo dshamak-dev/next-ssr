@@ -3,7 +3,7 @@ import Button from "./Button.js";
 import { useCallback, useState } from "react";
 import { createSession, getSession } from "../api/session.api.js";
 import Link from "next/link.js";
-import Popup from "./Popup.js";
+import {Popup} from "./Popup.js";
 import Form from "./Form.js";
 import Input from "./Input.js";
 import { setUserTransaction } from "../api/user.api.js";

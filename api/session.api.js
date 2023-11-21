@@ -27,6 +27,14 @@ export const connectSessionUser = (domain, sessionId, userId) => {
   return post(domain, `sessions/${sessionId}/users`, null, JSON.stringify({ id: userId }));
 };
 
+export const createSessionBid = (domain, sessionId, body) => {
+  return post(domain, `sessions/${sessionId}/bids`, null, JSON.stringify(body));
+};
+
+export const updateSessionState = (domain, sessionId, body) => {
+  return put(domain, `sessions/${sessionId}/state`, null, JSON.stringify(body));
+};
+
 export const disconnectSessionUser = (domain, sessionId, userId) => {
   return del(domain, `sessions/${sessionId}/users/${userId}`, null);
 };

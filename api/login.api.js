@@ -2,14 +2,16 @@ import { post } from "./api.model.js";
 
 const _authTokenPath = "_auth_token";
 
+const storage = () => sessionStorage;
+
 export const getAuthToken = () => {
-  return localStorage.getItem(_authTokenPath) || null;
+  return storage().getItem(_authTokenPath) || null;
 };
 
 export const setAuthToken = (user) => {
   const token = typeof user === "object" ? JSON.stringify(user) : user || null;
 
-  localStorage.setItem(_authTokenPath, token);
+  storage().setItem(_authTokenPath, token);
 
   return token;
 };

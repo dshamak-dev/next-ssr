@@ -1,1 +1,13 @@
-[{"ownerId":"1a4bfe6d","id":"0b41cc5a","users":["1a4bfe6d",1700485340750,"930c79aa"]}]
+[
+  { "ownerId": "1a4bfe6d", "id": "0b41cc5a", "status": "pending", "users": [] },
+  {
+    "ownerId": "930c79aa",
+    "id": "52e531de",
+    "users": [
+      { "id": "930c79aa", "bid": 20, "status": "raise" },
+      { "id": "2d3090fb", "bid": 20, "status": "accept" }
+    ],
+    "bid": 20,
+    "status": "pending"
+  }
+]

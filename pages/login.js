@@ -58,10 +58,10 @@ export const Login = ({ apiDomain }) => {
 
       handleLogin({ ...entries, type: selectedTypeValue })
         .then((res) => {
-          const { email, type, id } = res;
+          const { email, type, id, name } = res;
 
           setAuthToken(
-            JSON.stringify({ email, type, id, createdAt: Date.now() })
+            JSON.stringify({ name, email, type, id, createdAt: Date.now() })
           );
 
           redirect(
