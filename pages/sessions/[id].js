@@ -43,8 +43,8 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
     [requestBid, id, user?.id]
   );
 
-  const handleSessionStateChange = useCallback((state) => {
-    requestStateChange({ state, userId: user.id });
+  const handleSessionStateChange = useCallback((status) => {
+    requestStateChange({ status, userId: user.id });
   }, [requestStateChange, user]);
 
   const isAdmin = useMemo(() => {

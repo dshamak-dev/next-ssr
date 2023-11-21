@@ -32,7 +32,7 @@ export const createSessionBid = (domain, sessionId, body) => {
 };
 
 export const updateSessionState = (domain, sessionId, body) => {
-  return put(domain, `sessions/${sessionId}/state`, null, JSON.stringify(body));
+  return put(domain, `sessions/${sessionId}/status`, null, JSON.stringify(body));
 };
 
 export const disconnectSessionUser = (domain, sessionId, userId) => {

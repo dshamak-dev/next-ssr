@@ -176,7 +176,25 @@ const init = (app) => {
 
     triggerSessionUpdate(sessionId, _updated);
 
-    res.status(200).end();
+    res.status(200).json({ ok: true });
+  });
+
+  app.put("/api/sessions/:sessionId/status", (req, res) => {
+    const sessionId = req.params.sessionId;
+    const { status, userId } = req.body;
+
+    const session = sessionsDB.find({ id: sessionId });
+    const hasMatch = session != null;
+
+    if (!hasMatch) {
+      return res.status(404).json({ error: "No session found" });
+    }
+
+    const _updated = sessionsDB.patch({ id: sessionId }, { status });
+
+    triggerSessionUpdate(sessionId, _updated);
+
+    res.status(200).json({ ok: true });
   });
 
   // Long Pulling
