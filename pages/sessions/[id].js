@@ -272,7 +272,7 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
         </div>
       </>
     );
-  }, [reconnect, session, isClosedSession]);
+  }, [logged, user, reconnect, session, isClosedSession]);
 
   return (
     <>
