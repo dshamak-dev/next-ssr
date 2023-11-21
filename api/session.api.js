@@ -12,7 +12,7 @@ export const createSession = (domain, userId) => {
 };
 
 export const getSession = (domain, sessionId) => {
-  return get(domain, `sessions/${sessionId}`);
+  return get(domain, `sessions/${String(sessionId).toLocaleLowerCase()}`);
 };
 
 export const subscribeToSession = (domain, sessionId, props) => {

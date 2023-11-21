@@ -10,7 +10,6 @@ html {
 a {
   color: black;
   text-decoration: underline;
-  user-select: none;
   cursor: pointer;
 }
 
@@ -28,12 +27,36 @@ a {
   &.between {
     justify-content: space-between;
   }
+  &.items-center {
+    align-items: center;
+  }
+  &.justify-center {
+    justify-content: center;
+  }
 }
 
 .gap-1 {
   gap: 1rem;
 }
+.gap-2 {
+  gap: 2rem;
+}
+.gap-3 {
+  gap: 3rem;
+}
+
+.text-center {
+  text-align: center;
+}
 
 .w-fit {
   width: fit-content !important;
+}
+
+.border-1 {
+  border: 1px solid currentColor;
+}
+
+.p-1 {
+  padding: 1rem;
 }

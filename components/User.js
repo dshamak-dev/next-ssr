@@ -129,7 +129,7 @@ export default function User({ apiDomain, user }) {
                     {it.source || "custom"}
                   </Link>
                   <span>{it.status || "pending"}</span>
-                  <span>{it.cost || 0}</span>
+                  <span>bid: {it.bid || 0}</span>
                 </div>
               );
             })

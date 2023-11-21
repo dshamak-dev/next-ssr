@@ -1,5 +1,37 @@
-const { uid } = require("./support.js");
-const { clientsDB } = require("./tables");
+const { uid, reduceRecord } = require("./support.js");
+const { clientsDB, sessionsDB } = require("./tables");
+
+const getClientHistory = (client) => {
+  return client?.history || [];
+};
+
+const getSessionPublicInfo = (id) => {
+  const session = sessionsDB.find({ id });
+
+  if (session == null) {
+    return { id };
+  }
+
+  const fields = reduceRecord(session, ["id", "status", 'bid']);
+
+  return Object.assign({}, fields);
+};
+
+const extendClient = (client) => {
+  const history = getClientHistory(client);
+
+  if (!client || !history.length) {
+    return client;
+  }
+
+  const _history = history.map((id) => getSessionPublicInfo(id));
+
+  const _extended = Object.assign({}, client, {
+    history: _history,
+  });
+
+  return _extended;
+};
 
 const init = (app) => {
   app.post("/api/login", async (req, res) => {
@@ -58,19 +90,12 @@ const init = (app) => {
         return res.status(404).json({ error: "No match" });
       }
 
-      let json = Object.assign({}, client);
-
-      const history = json.history || [];
-      const populatedHistoty = history.map((id) => ({
-        id,
-        source: "custom",
-        status: "pending",
-      }));
-
-      json.history = populatedHistoty;
+      const json = extendClient(client);
 
       res.status(200).json(json);
     } catch (err) {
+      console.log({ err });
+      
       res.status(400).json({ error: err.message });
     }
   });
@@ -97,7 +122,7 @@ const init = (app) => {
       let id = req.params.id;
 
       const { value, password } = req.body;
-      
+
       const client = clientsDB.find({ id, password });
       const hasMatch = client != null;
 

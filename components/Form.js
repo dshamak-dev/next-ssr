@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-export default function Form({ onSubmit, fields, children }) {
+export default function Form({ onSubmit, fields, children, ...other }) {
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -15,5 +15,5 @@ export default function Form({ onSubmit, fields, children }) {
     [fields, onSubmit]
   );
 
-  return <form onSubmit={handleSubmit}>{children}</form>;
+  return <form {...other} onSubmit={handleSubmit}>{children}</form>;
 }

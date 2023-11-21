@@ -11,7 +11,8 @@ const EVENT_TYPES = {
 
 const NAMINGS = {
   clients: "users",
-  bidValue: "bid"
+  bidValue: "bid",
+  results: "results",
 };
 
 const triggerSessionUpdate = (id, session) => {
@@ -26,12 +27,8 @@ const getSessionClients = (session) => {
   return session[NAMINGS.clients] || [];
 };
 
-const extendSession = (session) => {
-  if (!session || !getSessionClients(session).length) {
-    return session;
-  }
-
-  const users = getSessionClients(session)
+const getUsersPublicInfo = (users) => {
+  return users
     .map(({ id, ...other }) => {
       const user = clientsDB.find({ id });
 
@@ -40,13 +37,39 @@ const extendSession = (session) => {
       return Object.assign({}, fields, other);
     })
     .filter((it) => it != null);
+};
 
-  return Object.assign({}, session, { users });
+const extendSession = (session) => {
+  if (!session || !getSessionClients(session).length) {
+    return session;
+  }
+
+  const users = getUsersPublicInfo(getSessionClients(session));
+  let results = session[NAMINGS.results];
+
+  if (results != null) {
+    results = Object.assign({}, results, {
+      [NAMINGS.clients]: (results[NAMINGS.clients] || []).map(
+        ({ id, state }) => {
+          const other = users.find((it) => it.id === id);
+
+          return { ...other, id, state };
+        }
+      ),
+    });
+  }
+
+  const _extended = Object.assign({}, session, {
+    users,
+    [NAMINGS.results]: results,
+  });
+
+  return _extended;
 };
 
 const init = (app) => {
   app.get("/api/sessions/:sessionId", (req, res) => {
-    const id = req.params.sessionId;
+    const id = String(req.params.sessionId).toLocaleLowerCase();
 
     const session = sessionsDB.find({ id });
     const hasMatch = session != null;
@@ -65,7 +88,7 @@ const init = (app) => {
       ownerId,
       id: uid(),
       users: [],
-      status: "pending"
+      status: "pending",
     };
 
     sessionsDB.add(session);
@@ -141,7 +164,7 @@ const init = (app) => {
     const client = sessionClients[clientIndex];
     client.bid = clientBid;
     client.status =
-    clientBid > sessionBid
+      clientBid > sessionBid
         ? "raise"
         : clientBid === sessionBid
         ? "accept"
@@ -151,8 +174,9 @@ const init = (app) => {
 
     const _updated = sessionsDB.patch(
       { id: sessionId },
-      { [NAMINGS.clients]: sessionClients,
-        [NAMINGS.bidValue]: Math.max(sessionBid, clientBid)
+      {
+        [NAMINGS.clients]: sessionClients,
+        [NAMINGS.bidValue]: Math.max(sessionBid, clientBid),
       }
     );
 
@@ -174,14 +198,14 @@ const init = (app) => {
 
     const _updated = sessionsDB.patch({ id }, body);
 
-    triggerSessionUpdate(sessionId, _updated);
+    triggerSessionUpdate(sessionId, extendSession(_updated));
 
     res.status(200).json({ ok: true });
   });
 
   app.put("/api/sessions/:sessionId/status", (req, res) => {
     const sessionId = req.params.sessionId;
-    const { status, userId } = req.body;
+    const { status, userId, users } = req.body;
 
     const session = sessionsDB.find({ id: sessionId });
     const hasMatch = session != null;
@@ -190,9 +214,46 @@ const init = (app) => {
       return res.status(404).json({ error: "No session found" });
     }
 
-    const _updated = sessionsDB.patch({ id: sessionId }, { status });
+    let updates = { status };
 
-    triggerSessionUpdate(sessionId, _updated);
+    switch (status) {
+      case "resolved": {
+        const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
+        const winners = users.filter(({ state }) => state);
+        const amount = sessionBid / winners.length;
+
+        updates[NAMINGS.results] = {
+          [NAMINGS.clients]: users,
+          amount,
+        };
+
+        winners.forEach(({ id }) => {
+          const client = clientsDB.find({ id });
+
+          if (client != null) {
+            clientsDB.patch({ id }, { balance: client.balance + amount });
+          }
+        });
+        break;
+      }
+      case "active": {
+        const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
+        const clients = getSessionClients(session);
+
+        clients.forEach(({ id }) => {
+          const client = clientsDB.find({ id });
+
+          if (client != null) {
+            clientsDB.patch({ id }, { balance: client.balance - sessionBid });
+          }
+        });
+        break;
+      }
+    }
+
+    const _updated = sessionsDB.patch({ id: sessionId }, updates);
+
+    triggerSessionUpdate(sessionId, extendSession(_updated));
 
     res.status(200).json({ ok: true });
   });
