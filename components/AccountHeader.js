@@ -5,7 +5,7 @@ import { getEnvironmentProps } from "../support/env.utils.js";
 import { getUserBalance } from "../api/user.api.js";
 import { useEffect } from "react";
 
-export default function AccountHeader({ apiDomain }) {
+export default function AccountHeader({ apiDomain, depth = [] }) {
   const { logged, user, login } = useAuth();
   const [loading, balance, error, request] = useApi((userId) => getUserBalance(apiDomain, userId));
 
@@ -13,7 +13,7 @@ export default function AccountHeader({ apiDomain }) {
     if (user != null) {
       request(user.id);
     }
-  }, [user]);
+  }, [user, ...depth]);
 
   return (
     <>

@@ -1,6 +1,7 @@
 const { EventEmitter } = require("events");
-const { clientsDB, sessionsDB } = require("./tables");
-const { uid, reduceRecord } = require("./support.js");
+const { clientsDB, sessionsDB } = require("../scripts/tables");
+const { uid } = require("../scripts/support.js");
+const { findSession, extendSession, getSessionClients, SESSION_NAMINGS, createSession } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
 const EVENT_TYPES = {
@@ -9,69 +10,15 @@ const EVENT_TYPES = {
   STATE: "state",
 };
 
-const NAMINGS = {
-  clients: "users",
-  bidValue: "bid",
-  results: "results",
-};
-
 const triggerSessionUpdate = (id, session) => {
   emitter.emit(EVENT_TYPES.STATE, { id, state: session });
-};
-
-const getSessionClients = (session) => {
-  if (!session) {
-    return [];
-  }
-
-  return session[NAMINGS.clients] || [];
-};
-
-const getUsersPublicInfo = (users) => {
-  return users
-    .map(({ id, ...other }) => {
-      const user = clientsDB.find({ id });
-
-      const fields = reduceRecord(user, ["id", "email", "name"]);
-
-      return Object.assign({}, fields, other);
-    })
-    .filter((it) => it != null);
-};
-
-const extendSession = (session) => {
-  if (!session || !getSessionClients(session).length) {
-    return session;
-  }
-
-  const users = getUsersPublicInfo(getSessionClients(session));
-  let results = session[NAMINGS.results];
-
-  if (results != null) {
-    results = Object.assign({}, results, {
-      [NAMINGS.clients]: (results[NAMINGS.clients] || []).map(
-        ({ id, state }) => {
-          const other = users.find((it) => it.id === id);
-
-          return { ...other, id, state };
-        }
-      ),
-    });
-  }
-
-  const _extended = Object.assign({}, session, {
-    users,
-    [NAMINGS.results]: results,
-  });
-
-  return _extended;
 };
 
 const init = (app) => {
   app.get("/api/sessions/:sessionId", (req, res) => {
     const id = String(req.params.sessionId).toLocaleLowerCase();
 
-    const session = sessionsDB.find({ id });
+    const session = findSession({ id });
     const hasMatch = session != null;
 
     if (!hasMatch) {
@@ -84,14 +31,7 @@ const init = (app) => {
   app.post("/api/sessions/", (req, res) => {
     const { ownerId } = req.body;
 
-    const session = {
-      ownerId,
-      id: uid(),
-      users: [],
-      status: "pending",
-    };
-
-    sessionsDB.add(session);
+    const session = createSession(ownerId);
 
     res.status(200).json(session);
   });
@@ -159,7 +99,7 @@ const init = (app) => {
       return res.status(404).json({ error: "No such client" });
     }
 
-    const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
+    const sessionBid = Number(session[SESSION_NAMINGS.bidValue]) || 0;
 
     const client = sessionClients[clientIndex];
     client.bid = clientBid;
@@ -175,8 +115,8 @@ const init = (app) => {
     const _updated = sessionsDB.patch(
       { id: sessionId },
       {
-        [NAMINGS.clients]: sessionClients,
-        [NAMINGS.bidValue]: Math.max(sessionBid, clientBid),
+        [SESSION_NAMINGS.clients]: sessionClients,
+        [SESSION_NAMINGS.bidValue]: Math.max(sessionBid, clientBid),
       }
     );
 
@@ -222,8 +162,8 @@ const init = (app) => {
         const winners = users.filter(({ state }) => state);
         const amount = summary / winners.length;
 
-        updates[NAMINGS.results] = {
-          [NAMINGS.clients]: users,
+        updates[SESSION_NAMINGS.results] = {
+          [SESSION_NAMINGS.clients]: users,
           amount,
         };
 
@@ -237,7 +177,7 @@ const init = (app) => {
         break;
       }
       case "active": {
-        const sessionBid = Number(session[NAMINGS.bidValue]) || 0;
+        const sessionBid = Number(session[SESSION_NAMINGS.bidValue]) || 0;
         const clients = getSessionClients(session);
 
         updates.summary = sessionBid * clients.length;

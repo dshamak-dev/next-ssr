@@ -1,5 +1,5 @@
-const { uid, reduceRecord } = require("./support.js");
-const { clientsDB, sessionsDB } = require("./tables");
+const { uid, reduceRecord } = require("../scripts/support.js");
+const { clientsDB, sessionsDB } = require("../scripts/tables.js");
 
 const getClientHistory = (client) => {
   return client?.history || [];

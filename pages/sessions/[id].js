@@ -279,7 +279,7 @@ export default function SessionPage({ id, apiDomain, defaultState }) {
       <PageHead />
       <main className="session-page">
         <div className="flex between">
-          <AccountHeader apiDomain={apiDomain} />
+          <AccountHeader apiDomain={apiDomain} depth={[session?.status]} />
         </div>
         <div className="session-field">
           <h1>
