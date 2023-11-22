@@ -116,7 +116,7 @@ const init = (app) => {
       { id: sessionId },
       {
         [SESSION_NAMINGS.clients]: sessionClients,
-        [SESSION_NAMINGS.bidValue]: Math.max(sessionBid, clientBid),
+        [SESSION_NAMINGS.bidValue]: clientBid,
       }
     );
 

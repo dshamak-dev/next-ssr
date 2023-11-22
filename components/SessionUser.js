@@ -16,7 +16,7 @@ export default function SessionUser({ active, canKick, user }) {
           <span>{user?.status || "pending"}</span>
           {user?.bid ? <span>bid: {user.bid}</span> : null}
         </span>
-        {canKick ? <Button className="w-fit">kick</Button> : null}
+        {/* {canKick ? <Button className="w-fit">kick</Button> : null} */}
       </div>
       <style jsx>{`
         .session-user {
