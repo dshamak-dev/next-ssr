@@ -38,6 +38,7 @@
   const AUTH_KEY = "_auth_token";
 
   const STAGES = {
+    connectionError: 'connection-error',
     initial: "initial",
     pending: "pending",
     ended: "ended",
@@ -93,12 +94,8 @@
       }
 
       const handleError = (err) => {
-        console.warn({ err });
-
         if (_self.canListen()) {
           _self.listen();
-        } else {
-          console.warn("can't listen");
         }
       };
 
@@ -109,11 +106,29 @@
         get(`sessions/${this.sessionId}/listen`, {
           signal: abortController.signal,
         })
-          .then((res) => res.json())
-          .then((session) => {
-            console.log('listened', session);
+          .then((res) => {
+            switch(res.status) {
+              case 404: {
+                _self.set('stage', STAGES.ended);
 
+                return { error: 'no connection' };
+              }
+              default: {
+                return res.json();
+                break;
+              }
+            }
+          })
+          .then((session) => {
             _self.set("session", session, true);
+          })
+          .catch(err => {
+            if (err.message.includes('Failed to fetch')) {
+              _self.set('session', null);
+              _self.set('stage', STAGES.connectionError, true);
+            }
+
+            return err;
           })
           .finally(() => {
             _self.listen();
@@ -161,8 +176,6 @@
     getUserBidState() {
       const bid = Number(this.getUserBid());
 
-      console.log("getUserBidState", { bid });
-
       return !Number.isNaN(bid) && bid > 0;
     }
 
@@ -186,8 +199,6 @@
       const hasBidRequest = this.getBidState();
       
       this.pendingBid = hasBidRequest ? false : this.pendingBid;
-
-      // console.warn({ hasBidRequest });
 
       if (hasBidRequest || this.pendingBid) {
         this.pendingBid = false;
@@ -313,8 +324,6 @@
           return null;
         });
 
-      console.log({ session });
-
       this.set("session", session, true);
 
       this.validate();
@@ -365,6 +374,16 @@
             }
             break;
           }
+          case STAGES.connectionError: {
+            contentEl = document.createElement("button");
+            contentEl.innerText = "Oops. Connection error. Reconnect?";
+
+            contentEl.onclick = () => {
+              location.pathname = location.pathname;
+            };
+
+            break;
+          }
           default: {
             contentEl = document.createElement('span');
             contentEl.innerText = 'Done. Injoy!';
@@ -410,9 +429,7 @@
 
         startClient(sessionId);
       })
-      .catch((err) => {
-        // console.warn(err.message);
-      });
+      .catch((err) => {});
   };
 
   const getSession = () => {
@@ -425,9 +442,7 @@
 
         startClient(sessionId);
       })
-      .catch((err) => {
-        // console.warn(err.message);
-      });
+      .catch((err) => {});
   };
 
   getSession();
