@@ -1,10 +1,12 @@
 const { clientsDB, sessionsDB } = require("../scripts/tables");
 const { reduceRecord, uid } = require("../scripts/support.js");
+const { getUsersPublicInfo } = require("./user.controls.js");
 
 const SESSION_NAMINGS = {
   clients: "users",
   bidValue: "bid",
   results: "results",
+  status: 'status',
 };
 
 const getSessionClients = (session) => {
@@ -13,18 +15,6 @@ const getSessionClients = (session) => {
   }
 
   return session[SESSION_NAMINGS.clients] || [];
-};
-
-const getUsersPublicInfo = (users) => {
-  return users
-    .map(({ id, ...other }) => {
-      const user = clientsDB.find({ id });
-
-      const fields = reduceRecord(user, ["id", "email", "name"]);
-
-      return Object.assign({}, fields, other);
-    })
-    .filter((it) => it != null);
 };
 
 const extendSession = (session) => {
@@ -73,11 +63,23 @@ const createSession = (ownerId, props = {}) => {
   return session;
 };
 
+const getSessionPublicInfo = (id) => {
+  const session = sessionsDB.find({ id });
+
+  if (session == null) {
+    return { id };
+  }
+
+  const fields = reduceRecord(session, ["id", "status", 'bid']);
+
+  return Object.assign({}, fields);
+};
+
 module.exports = {
   SESSION_NAMINGS,
   getSessionClients,
   extendSession,
-  getUsersPublicInfo,
   findSession,
   createSession,
+  getSessionPublicInfo
 };

@@ -1,10 +1,10 @@
 export default function GamePage({ id }) {
-  const gamerId = Date.now();
+  const playerId = Date.now();
 
   return <main>
     <h1>Game Page #{id}</h1>
 
-    <script defer src="http://localhost:3001/bidon.js?company=23ed84" player={gamerId}></script>
+    <script defer src={`http://localhost:3001/bidon.js?company=23ed84&player=${playerId}`}></script>
   </main>
 }
 

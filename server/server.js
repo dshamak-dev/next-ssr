@@ -45,10 +45,11 @@ app.get("/bidon.js", (req, res) => {
   const filePath =  path.join(__dirname, './bidon.js');
   const file = fs.readFileSync(filePath).toString();
 
-  const companyId = req.query.company;
+  const { company, player } = req.query;
 
   let updated = file.replace('__API_DOMAIN__', API_DOMAIN);
-  updated = updated.replace('__COMPANY_ID__', companyId);
+  updated = updated.replace('__COMPANY_ID__', company);
+  updated = updated.replace('__PLAYER_ID__', player);
 
   res.send(updated);
 });

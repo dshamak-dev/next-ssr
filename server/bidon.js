@@ -1,6 +1,11 @@
 (function () {
   const API_DOMAIN = "__API_DOMAIN__";
   const COMPANY_ID = "__COMPANY_ID__";
+  const PLAYER_ID = "__PLAYER_ID__";
+
+  const getStorage = () => {
+    return localStorage;
+  };
 
   const joinPath = (path) => {
     let url = `${API_DOMAIN}/api/${path.replace(/^\//, "")}`;
@@ -30,9 +35,12 @@
     });
   };
 
+  const AUTH_KEY = "_auth_token";
+
   const STAGES = {
     initial: "initial",
     pending: "pending",
+    ended: "ended",
   };
 
   class Client {
@@ -62,27 +70,49 @@
 
       this.element = document.createElement("div");
 
+      try {
+        this.authToken = JSON.parse(getStorage().getItem(AUTH_KEY));
+      } catch (err) {}
+
       this.sync();
     }
 
     listen() {
       const _self = this;
 
+      if (this.abortController?.abort) {
+        this.abortController.abort();
+      }
+
+      if (!_self.canListen()) {
+        return;
+      }
+
       const handleError = (err) => {
         console.warn({ err });
 
         if (_self.canListen()) {
           _self.listen();
+        } else {
+          console.warn("can't listen");
         }
       };
 
       try {
-        get(`sessions/${this.sessionId}/listen`)
+        const abortController = new AbortController();
+        _self.set("abortController", abortController);
+
+        get(`sessions/${this.sessionId}/listen`, {
+          signal: abortController.signal,
+        })
           .then((res) => res.json())
           .then((session) => {
             _self.set("session", session, true);
           })
-          .catch((err) => handleError(err));
+          .finally(() => {
+            _self.listen();
+            _self.set("abortController", null);
+          });
       } catch (err) {
         handleError(err);
       }
@@ -126,31 +156,26 @@
       return userBid !== sessionBid;
     }
 
+    validate() {
+      const hasBidRequest = this.getBidState();
+
+      // console.warn({ hasBidRequest });
+
+      if (hasBidRequest) {
+        this.handleSendBid();
+      }
+    }
+
     set(key, value, shouldRender = false) {
       this[key] = value;
 
       switch (key) {
         case "session": {
-          const hasBidRequest = this.getBidState();
-
-          if (hasBidRequest) {
-            const bid = Number(this.session.bid);
-
-            const ownBid = this.ask(
-              `The "${bid}" bid  was requested. Accept or Change?`,
-              (value) => {
-                return! Number.isNaN(Number(value));
-              },
-              (value) => (Number(value))
-            );
-            const hasConfirm = ownBid == bid;
-
-            if (hasConfirm) {
-              this.set("pendingBid", bid);
-            } else {
-            }
+          if (["active", "resolved"].includes(value?.status)) {
+            this.set("stage", STAGES.ended);
           }
 
+          // console.log("set session", value);
           break;
         }
       }
@@ -161,31 +186,43 @@
     }
 
     async auth() {
-      const email = this.ask("Email", (res) => !!res.trim());
-      const password = this.ask("password", (res) => !!res.trim());
+      if (this.authToken != null) {
+        const useCached = confirm(
+          `Continue as ${this.authToken.name || this.authToken.email}?`
+        );
 
-      this.set("loading", true, true);
+        this.set("user", useCached ? this.authToken : null);
 
-      const sessionId = this.sessionId;
+        this.validate();
+      }
 
-      const response = await post("login", null, { email, password })
-        .then((res) => res.json())
-        .then(async (user) => {
-          await post(`sessions/${sessionId}/users`, null, { id: user?.id });
+      if (this.user == null || !this.user.id) {
+        const email = this.ask("Email", (res) => !!res.trim());
+        const password = this.ask("password", (res) => !!res.trim());
 
-          return user;
-        })
-        .catch((err) => {
-          return {
-            error: err.message,
-          };
-        });
+        this.set("loading", true, true);
 
-      this.set("user", response);
+        const user = await post("login", null, { email, password })
+          .then((res) => res.json())
+          .then((user) => {
+            getStorage().setItem(AUTH_KEY, JSON.stringify(user));
 
-      this.set("stage", STAGES.pending);
+            return user;
+          })
+          .catch((err) => {
+            return {
+              error: err.message,
+            };
+          });
 
-      this.set("loading", false, true);
+        this.set("user", user);
+
+        this.validate();
+
+        this.set("loading", false, true);
+      }
+
+      this.connect();
     }
 
     handleSendBid() {
@@ -201,24 +238,51 @@
       const body = {
         value: Number(value),
         userId: this.user.id,
+        autoActivation: true,
       };
 
       post(`sessions/${this.sessionId}/bids`, null, body);
     }
 
     async sync() {
-      const session = await get(`sessions/${this.sessionId}`).then((res) =>
-        res.json()
-      );
+      const session = await get(`sessions/${this.sessionId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+          return null;
+        });
 
-      this.set("session", session);
+      this.set("session", session, true);
 
       this.listen();
 
       this.render();
     }
 
-    connect() {}
+    async connect() {
+      const user = this.user;
+
+      if (!user?.id) {
+        return this.set("stage", STAGES.initial);
+      }
+
+      const sessionId = this.sessionId;
+
+      const session = await post(`sessions/${sessionId}/users`, null, {
+        id: user?.id,
+        playerId: PLAYER_ID,
+      })
+        .then((res) => res.json())
+        .catch((err) => {
+          return {
+            error: err.message,
+          };
+        });
+
+      this.set("session", session);
+      this.set("stage", STAGES.pending, true);
+
+      this.validate();
+    }
 
     render() {
       if (this.element.parentNode == null) {
@@ -231,28 +295,40 @@
         contentEl = document.createElement("p");
         contentEl.innerText = "Loading";
       } else {
+        const bid = Number(this.session.bid);
+        const hasBidRequest = this.getBidState();
+
         switch (this.stage) {
           case STAGES.initial: {
             contentEl = document.createElement("button");
-            contentEl.innerText = "Log In";
+            contentEl.innerText = hasBidRequest
+              ? `Opponent bet "${bid}". Log In to respond`
+              : "Bid On";
             contentEl.onclick = this.auth.bind(this);
             break;
           }
           case STAGES.pending: {
             contentEl = document.createElement("button");
-            contentEl.innerText = "Bid On";
+            contentEl.innerText = hasBidRequest
+              ? `Opponent bet "${bid}". Respond`
+              : "Bid On";
             contentEl.onclick = () => this.handleSendBid();
             break;
           }
           default: {
+            contentEl = null;
           }
         }
       }
 
       this.element.innerHTML = "";
-      this.element.append(contentEl);
+
+      if (contentEl) {
+        this.element.append(contentEl);
+      }
 
       // const debugEl = document.createElement("i");
+      // debugEl.setAttribute("style", ``);
       // debugEl.innerHTML = JSON.stringify(this.session);
       // this.element.append(debugEl);
     }
@@ -267,11 +343,10 @@
   };
 
   const el = document.currentScript;
-  const playerId = el.getAttribute("player");
   const { connectionId } = parsePath(location.pathname);
 
   const startClient = (sessionId) => {
-    const _client = new Client(playerId, sessionId);
+    const _client = new Client(PLAYER_ID, sessionId);
   };
 
   const createSession = () => {
@@ -285,7 +360,7 @@
         startClient(sessionId);
       })
       .catch((err) => {
-        console.warn(err.message);
+        // console.warn(err.message);
       });
   };
 
@@ -300,7 +375,7 @@
         startClient(sessionId);
       })
       .catch((err) => {
-        console.warn(err.message);
+        // console.warn(err.message);
       });
   };
 
