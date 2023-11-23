@@ -1,20 +1,10 @@
-const { uid, reduceRecord } = require("../scripts/support.js");
-const { clientsDB, sessionsDB } = require("../scripts/tables.js");
+const { getSessionPublicInfo } = require("../controls/session.controls.js");
+const { getUsersPublicInfo } = require("../controls/user.controls.js");
+const { uid } = require("../scripts/support.js");
+const { clientsDB } = require("../scripts/tables.js");
 
 const getClientHistory = (client) => {
   return client?.history || [];
-};
-
-const getSessionPublicInfo = (id) => {
-  const session = sessionsDB.find({ id });
-
-  if (session == null) {
-    return { id };
-  }
-
-  const fields = reduceRecord(session, ["id", "status", 'bid']);
-
-  return Object.assign({}, fields);
 };
 
 const extendClient = (client) => {
@@ -92,7 +82,7 @@ const init = (app) => {
 
       const json = extendClient(client);
 
-      res.status(200).json(json);
+      res.status(200).json(getUsersPublicInfo(json));
     } catch (err) {
       console.log({ err });
       

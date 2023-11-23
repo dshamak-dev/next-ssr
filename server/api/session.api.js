@@ -1,7 +1,13 @@
 const { EventEmitter } = require("events");
 const { clientsDB, sessionsDB } = require("../scripts/tables");
 const { uid } = require("../scripts/support.js");
-const { findSession, extendSession, getSessionClients, SESSION_NAMINGS, createSession } = require("../controls/session.controls.js");
+const {
+  findSession,
+  extendSession,
+  getSessionClients,
+  SESSION_NAMINGS,
+  createSession,
+} = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
 const EVENT_TYPES = {
@@ -38,7 +44,7 @@ const init = (app) => {
 
   app.post("/api/sessions/:sessionId/users", (req, res) => {
     const sessionId = req.params.sessionId;
-    const { id: userId } = req.body;
+    const { id: userId, ...otherUserData } = req.body;
 
     const session = sessionsDB.find({ id: sessionId });
     const hasMatch = session != null;
@@ -64,23 +70,27 @@ const init = (app) => {
 
     const sessionUsers = getSessionClients(session);
 
-    if (!sessionUsers.includes(userId)) {
-      sessionUsers.push({ id: userId });
+    if (!sessionUsers.find((it) => it.id === userId)) {
+      sessionUsers.push({ ...otherUserData, id: userId });
 
       const _updated = sessionsDB.patch(
         { id: sessionId },
         { users: sessionUsers }
       );
 
-      triggerSessionUpdate(sessionId, extendSession(_updated));
+      const json = extendSession(session);
+
+      triggerSessionUpdate(sessionId, json);
+
+      return res.status(200).json(json);
     }
 
-    res.status(200).end();
+    res.status(200).json(extendSession(session));
   });
 
   app.post("/api/sessions/:id/bids", (req, res) => {
     const sessionId = req.params.id;
-    const { userId, value } = req.body;
+    const { userId, value, autoActivation = false } = req.body;
     const clientBid = Number(value) || 0;
 
     const session = sessionsDB.find({ id: sessionId });
@@ -112,13 +122,18 @@ const init = (app) => {
 
     sessionClients.splice(clientIndex, 1, client);
 
-    const _updated = sessionsDB.patch(
-      { id: sessionId },
-      {
-        [SESSION_NAMINGS.clients]: sessionClients,
-        [SESSION_NAMINGS.bidValue]: clientBid,
-      }
-    );
+    const updateFields = {
+      [SESSION_NAMINGS.clients]: sessionClients,
+      [SESSION_NAMINGS.bidValue]: clientBid,
+    };
+
+    if (autoActivation) {
+      const allAccepted = sessionClients.every((_user) => Number(_user[SESSION_NAMINGS.bidValue]) === sessionBid);
+      
+      updateFields[SESSION_NAMINGS.status] = allAccepted ? 'active' : session[SESSION_NAMINGS.status];
+    }
+
+    const _updated = sessionsDB.patch({ id: sessionId }, updateFields);
 
     triggerSessionUpdate(sessionId, extendSession(_updated));
 

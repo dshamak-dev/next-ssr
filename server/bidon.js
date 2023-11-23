@@ -65,6 +65,10 @@
       return [STAGES.initial, STAGES.pending].includes(this.stage);
     }
 
+    logged() {
+      return this.user != null && this.user.id != null;
+    }
+
     setup() {
       this.stage = STAGES.initial;
 
@@ -107,6 +111,8 @@
         })
           .then((res) => res.json())
           .then((session) => {
+            console.log('listened', session);
+
             _self.set("session", session, true);
           })
           .finally(() => {
@@ -128,40 +134,63 @@
       return format ? format(answer) : answer;
     }
 
-    getBidState() {
-      const sessionBid = Number(this.session?.bid);
+    getSessionBid() {
+      return Number(this.session?.bid);
+    }
 
-      if (Number.isNaN(sessionBid) && sessionBid !== 0) {
-        return false;
-      }
-
+    getUserBid() {
       const user = this.user;
 
       if (user == null) {
-        return true;
+        return null;
       }
 
-      const sessionUsers = this.session.users || [];
+      const sessionUsers = this.session?.users || [];
       const userIndex = sessionUsers.findIndex((it) => {
         return it.id === user.id;
       });
       const inSession = userIndex !== -1;
 
       if (!inSession) {
-        return true;
+        return null;
       }
 
-      const userBid = Number(sessionUsers[userIndex]?.bid);
+      return Number(sessionUsers[userIndex]?.bid);
+    }
+
+    getUserBidState() {
+      const bid = Number(this.getUserBid());
+
+      console.log("getUserBidState", { bid });
+
+      return !Number.isNaN(bid) && bid > 0;
+    }
+
+    getBidState() {
+      const sessionBid = this.getSessionBid();
+
+      if (Number.isNaN(sessionBid) && sessionBid !== 0) {
+        return false;
+      }
+
+      const userBid = this.getUserBid();
+
+      if (!userBid) {
+        return true;
+      }
 
       return userBid !== sessionBid;
     }
 
     validate() {
       const hasBidRequest = this.getBidState();
+      
+      this.pendingBid = hasBidRequest ? false : this.pendingBid;
 
       // console.warn({ hasBidRequest });
 
-      if (hasBidRequest) {
+      if (hasBidRequest || this.pendingBid) {
+        this.pendingBid = false;
         this.handleSendBid();
       }
     }
@@ -171,11 +200,21 @@
 
       switch (key) {
         case "session": {
-          if (["active", "resolved"].includes(value?.status)) {
-            this.set("stage", STAGES.ended);
+          switch (value?.status) {
+            case "active":
+            case "resolved": {
+              this.set("stage", STAGES.ended, true);
+              break;
+            }
+            default: {
+              this.set(
+                "stage",
+                this.logged() ? STAGES.pending : STAGES.initial,
+                true
+              );
+              break;
+            }
           }
-
-          // console.log("set session", value);
           break;
         }
       }
@@ -226,18 +265,16 @@
     }
 
     handleSendBid() {
-      const value = this.ask(
-        "What is your Bid?",
-        (bid) => !Number.isNaN(Number(bid)) && bid > 0
-      );
+      const _self = this;
+      const value = this.ask("What is your Bid?", (bid) => true);
 
-      if (!value) {
+      if (!value || !this.user) {
         return;
       }
 
       const body = {
         value: Number(value),
-        userId: this.user.id,
+        userId: _self.user.id,
         autoActivation: true,
       };
 
@@ -262,7 +299,7 @@
       const user = this.user;
 
       if (!user?.id) {
-        return this.set("stage", STAGES.initial);
+        return this.set("stage", STAGES.initial, true);
       }
 
       const sessionId = this.sessionId;
@@ -273,18 +310,18 @@
       })
         .then((res) => res.json())
         .catch((err) => {
-          return {
-            error: err.message,
-          };
+          return null;
         });
 
-      this.set("session", session);
-      this.set("stage", STAGES.pending, true);
+      console.log({ session });
+
+      this.set("session", session, true);
 
       this.validate();
     }
 
     render() {
+      const _self = this;
       if (this.element.parentNode == null) {
         document.body.append(this.element);
       }
@@ -295,28 +332,42 @@
         contentEl = document.createElement("p");
         contentEl.innerText = "Loading";
       } else {
-        const bid = Number(this.session.bid);
+        const bid = Number(this.session?.bid);
         const hasBidRequest = this.getBidState();
+        const hasBidPosted = this.getUserBidState();
+        const canPostBid = hasBidRequest || !hasBidPosted;
 
         switch (this.stage) {
           case STAGES.initial: {
             contentEl = document.createElement("button");
             contentEl.innerText = hasBidRequest
-              ? `Opponent bet "${bid}". Log In to respond`
+              ? `Current Bid is "${bid}". You In?`
+              : hasBidPosted
+              ? "waiting for opponent..."
               : "Bid On";
-            contentEl.onclick = this.auth.bind(this);
+            contentEl.onclick = () => {
+              _self.pendingBid = !hasBidRequest;
+
+              _self.auth();
+            };
             break;
           }
           case STAGES.pending: {
-            contentEl = document.createElement("button");
+            contentEl = document.createElement(canPostBid ? "button" : "p");
             contentEl.innerText = hasBidRequest
-              ? `Opponent bet "${bid}". Respond`
+              ? `Opponent bet "${bid}". Respond?`
+              : hasBidPosted
+              ? "waiting for opponent..."
               : "Bid On";
-            contentEl.onclick = () => this.handleSendBid();
+
+            if (canPostBid) {
+              contentEl.onclick = this.handleSendBid.bind(this);
+            }
             break;
           }
           default: {
-            contentEl = null;
+            contentEl = document.createElement('span');
+            contentEl.innerText = 'Done. Injoy!';
           }
         }
       }
