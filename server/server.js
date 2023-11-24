@@ -10,6 +10,7 @@ const tables = require('./scripts/tables');
 const { useUserApi } = require("./api/users.api");
 const { useSessionApi } = require("./api/session.api");
 const { useConnectionApi } = require("./api/connect.api.js");
+const { useGameApi } = require("./api/game.api.js");
 
 require('dotenv').config({ path: '../.env' });
 
@@ -40,16 +41,16 @@ app.get("/health", (req, res) => {
 useUserApi(app);
 useSessionApi(app);
 useConnectionApi(app);
+useGameApi(app);
 
-app.get("/bidon.js", (req, res) => {
-  const filePath =  path.join(__dirname, './bidon.js');
+app.get("/contest/client", (req, res) => {
+  const filePath =  path.join(__dirname, './client.script.js');
   const file = fs.readFileSync(filePath).toString();
 
-  const { company, player } = req.query;
+  const { company } = req.query;
 
   let updated = file.replace('__API_DOMAIN__', API_DOMAIN);
   updated = updated.replace('__COMPANY_ID__', company);
-  updated = updated.replace('__PLAYER_ID__', player);
 
   res.send(updated);
 });

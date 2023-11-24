@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 
-export const useApi = (request, json = false) => {
+export const useApi = (request, json = false, defaultState = null) => {
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState(defaultState);
   const [error, setError] = useState(null);
   // const [controller, setController] = useState(null);
 
@@ -60,11 +60,9 @@ export const useApi = (request, json = false) => {
     [request, handleError]
   );
 
-  // const abort = useCallback(() => {
-  //   try {
-  //     console.abort();
-  //   } catch (err) {}
-  // }, [controller]);
+  const forceData = useCallback((data) => {
+    setResponse(data);
+  }, [setResponse]);
 
   const reset = useCallback(() => {
     setResponse(null);
@@ -72,5 +70,5 @@ export const useApi = (request, json = false) => {
     setLoading(false);
   }, []);
 
-  return [loading, response, error, trigger, reset];
+  return [loading, response, error, trigger, reset, forceData];
 };

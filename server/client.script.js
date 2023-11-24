@@ -1,7 +1,7 @@
 (function () {
   const API_DOMAIN = "__API_DOMAIN__";
   const COMPANY_ID = "__COMPANY_ID__";
-  const PLAYER_ID = "__PLAYER_ID__";
+  let PLAYER_ID = null;
 
   const getStorage = () => {
     return localStorage;
@@ -55,12 +55,7 @@
 
     element;
 
-    constructor(playerId, sessionId) {
-      this.playerId = playerId;
-      this.sessionId = sessionId;
-
-      this.setup();
-    }
+    constructor() {}
 
     canListen() {
       return [STAGES.initial, STAGES.pending].includes(this.stage);
@@ -70,10 +65,15 @@
       return this.user != null && this.user.id != null;
     }
 
-    setup() {
-      this.stage = STAGES.initial;
+    setup(playerId, sessionId) {
+      this.playerId = playerId;
+      this.sessionId = sessionId;
 
-      this.element = document.createElement("div");
+      this.stage = STAGES.initial;
+      const elemId = 'contest-client-output';
+
+      this.element = document.getElementById(elemId) || document.createElement("div");
+      this.element.setAttribute('id', elemId);
 
       try {
         this.authToken = JSON.parse(getStorage().getItem(AUTH_KEY));
@@ -335,6 +335,12 @@
         document.body.append(this.element);
       }
 
+      this.element.innerHTML = "";
+
+      if (!this.visibility) {
+        return;
+      }
+
       let contentEl = null;
 
       if (this.loading) {
@@ -375,23 +381,21 @@
             break;
           }
           case STAGES.connectionError: {
-            contentEl = document.createElement("button");
-            contentEl.innerText = "Oops. Connection error. Reconnect?";
+            // contentEl = document.createElement("button");
+            // contentEl.innerText = "Oops. Connection error. Reconnect?";
 
-            contentEl.onclick = () => {
-              location.pathname = location.pathname;
-            };
+            // contentEl.onclick = () => {
+            //   location.pathname = location.pathname;
+            // };
 
             break;
           }
           default: {
             contentEl = document.createElement('span');
-            contentEl.innerText = 'Done. Injoy!';
+            contentEl.innerText = 'all bids accepted!';
           }
         }
       }
-
-      this.element.innerHTML = "";
 
       if (contentEl) {
         this.element.append(contentEl);
@@ -415,8 +419,10 @@
   const el = document.currentScript;
   const { connectionId } = parsePath(location.pathname);
 
+  let _client = new Client();
+
   const startClient = (sessionId) => {
-    const _client = new Client(PLAYER_ID, sessionId);
+    _client.setup(PLAYER_ID, sessionId);
   };
 
   const createSession = () => {
@@ -445,5 +451,45 @@
       .catch((err) => {});
   };
 
-  getSession();
+  class Contest {
+    playerId;
+    connectionId;
+    companyId;
+    connected = false;
+    
+    constructor(connectionId) {
+      this.companyId = COMPANY_ID;
+      this.connectionId = connectionId;
+    }
+
+    connect(playerId) {
+      if (playerId == null || this.connected) {
+        return false;
+      }
+
+      PLAYER_ID = playerId;
+
+      this.playerId = playerId;
+
+      this.connected = true;
+
+      getSession();
+    }
+  }
+
+  const _contest = new Contest(connectionId);
+
+  window.Contest = {
+    show: () => {
+      _client.set('visibility', true, true);
+    },
+    hide: () => {
+      _client.set('visibility', false, true);
+    },
+    connect: (playerId) => {
+      console.info('Contest - Connect', { playerId });
+
+      _contest.connect(playerId);
+    }
+  };
 })();

@@ -1,5 +1,6 @@
 * {
   margin: 0;
+  box-sizing: border-box;
 }
 
 html {
@@ -20,10 +21,6 @@ a {
 .flex {
   display: flex;
 
-  &.col {
-    flex-direction: column;
-  }
-
   &.between {
     justify-content: space-between;
   }
@@ -34,19 +31,33 @@ a {
     justify-content: center;
   }
 }
+.flex.col {
+  flex-direction: column;
+}
+.flex.wrap {
+  flex-wrap: wrap;
+}
 
 .gap-1 {
-  gap: 1rem;
+  gap: 1em;
 }
 .gap-2 {
-  gap: 2rem;
+  gap: 2em;
 }
 .gap-3 {
-  gap: 3rem;
+  gap: 3em;
 }
 
 .text-center {
   text-align: center;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.w-min {
+  width: min-content !important;
 }
 
 .w-fit {
@@ -57,6 +68,10 @@ a {
   border: 1px solid currentColor;
 }
 
+.text-xs {
+  font-size: 0.8em;
+}
+
 .p-1 {
-  padding: 1rem;
+  padding: 1em;
 }
