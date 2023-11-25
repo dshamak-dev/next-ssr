@@ -1,6 +1,7 @@
 const { uid, reduceRecord } = require("../scripts/support.js");
 const { EventEmitter } = require("events");
 const { gamesDB } = require("../scripts/tables.js");
+const Contest = require("../server.script.js");
 
 const emitter = new EventEmitter();
 const EVENT_TYPES = {
@@ -138,10 +139,10 @@ class Game {
     const stateValues = Object.values(this.state || {});
 
     switch (this.status) {
-      case GAME_STATUS.draft:
       case GAME_STATUS.draft: {
         // Min 2 players required
-        const allReady = stateValues.length > 1 && stateValues.every(({ ready }) => ready);
+        const allReady =
+          stateValues.length > 1 && stateValues.every(({ ready }) => ready);
 
         if (allReady) {
           this.status = GAME_STATUS.active;
@@ -149,7 +150,8 @@ class Game {
 
         break;
       }
-      default: {
+      case GAME_STATUS.active:
+      case GAME_STATUS.pending: {
         const numbersCount = stateValues.filter(({ number }) => {
           const _num = number == null ? NaN : Number(number);
 
@@ -165,6 +167,10 @@ class Game {
   }
 
   resolve() {
+    if (this.status === GAME_STATUS.closed && this.results != null) {
+      return this.results;
+    }
+
     this.status = GAME_STATUS.closed;
 
     const allNumbers = Object.values(this.state).map((it) => {
@@ -188,6 +194,8 @@ class Game {
       },
       {}
     );
+
+    Contest.resolve("23ed84", this.id, { players: results });
 
     this.results = results;
   }

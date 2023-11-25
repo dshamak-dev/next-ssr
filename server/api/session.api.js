@@ -7,6 +7,7 @@ const {
   getSessionClients,
   SESSION_NAMINGS,
   createSession,
+  resolveSession,
 } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
@@ -128,9 +129,13 @@ const init = (app) => {
     };
 
     if (autoActivation) {
-      const allAccepted = sessionClients.every((_user) => Number(_user[SESSION_NAMINGS.bidValue]) === sessionBid);
-      
-      updateFields[SESSION_NAMINGS.status] = allAccepted ? 'active' : session[SESSION_NAMINGS.status];
+      const allAccepted = sessionClients.every(
+        (_user) => Number(_user[SESSION_NAMINGS.bidValue]) === sessionBid
+      );
+
+      updateFields[SESSION_NAMINGS.status] = allAccepted
+        ? "active"
+        : session[SESSION_NAMINGS.status];
     }
 
     const _updated = sessionsDB.patch({ id: sessionId }, updateFields);
@@ -171,24 +176,11 @@ const init = (app) => {
 
     let updates = { status };
 
+    let _updated = session;
+
     switch (status) {
       case "resolved": {
-        const summary = Number(session.summary) || 0;
-        const winners = users.filter(({ state }) => state);
-        const amount = summary / winners.length;
-
-        updates[SESSION_NAMINGS.results] = {
-          [SESSION_NAMINGS.clients]: users,
-          amount,
-        };
-
-        winners.forEach(({ id }) => {
-          const client = clientsDB.find({ id });
-
-          if (client != null) {
-            clientsDB.patch({ id }, { balance: client.balance + amount });
-          }
-        });
+        _updated = resolveSession({ id: sessionId }, users);
         break;
       }
       case "active": {
@@ -204,11 +196,15 @@ const init = (app) => {
             clientsDB.patch({ id }, { balance: client.balance - sessionBid });
           }
         });
+
+        _updated = sessionsDB.patch({ id: sessionId }, updates);
+        break;
+      }
+      default: {
+        _updated = sessionsDB.patch({ id: sessionId }, updates);
         break;
       }
     }
-
-    const _updated = sessionsDB.patch({ id: sessionId }, updates);
 
     triggerSessionUpdate(sessionId, extendSession(_updated));
 

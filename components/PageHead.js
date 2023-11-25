@@ -1,8 +1,8 @@
 import Head from "next/head";
 
 export const _defaultMetadata = {
-  title: "Bidon",
-  description: "Bid On Anything",
+  title: "Contest",
+  description: "Contest Anything",
 };
 
 

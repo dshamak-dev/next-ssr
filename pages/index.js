@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import styles from "../styles/Index.module.scss";
 import PageHead from "../components/PageHead.js";
 
-const _words = ["gamblig", "fun", "better", "creative", "competitive"];
+const _words = ["contest", "fun", "better", "creative", "competitive"];
 const _delay = 1000;
 
 export const Index = () => {

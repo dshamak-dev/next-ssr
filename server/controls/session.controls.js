@@ -6,7 +6,7 @@ const SESSION_NAMINGS = {
   clients: "users",
   bidValue: "bid",
   results: "results",
-  status: 'status',
+  status: "status",
 };
 
 const getSessionClients = (session) => {
@@ -70,9 +70,39 @@ const getSessionPublicInfo = (id) => {
     return { id };
   }
 
-  const fields = reduceRecord(session, ["id", "status", 'bid']);
+  const fields = reduceRecord(session, ["id", "status", "bid"]);
 
   return Object.assign({}, fields);
+};
+
+const resolveSession = (sessionQuery, participants) => {
+  const session = findSession(sessionQuery);
+
+  if (!session || session.status === 'resolved') {
+    return session;
+  }
+
+  const summary = Number(session.summary) || 0;
+  const winners = participants.filter(({ state }) => state);
+  const amount = summary / winners.length;
+
+  const updates = {
+    [SESSION_NAMINGS.status]: 'resolved',
+    [SESSION_NAMINGS.results]: {
+      [SESSION_NAMINGS.clients]: participants,
+      amount,
+    },
+  };
+
+  winners.forEach(({ state, ...props }) => {
+    const client = clientsDB.find(props);
+
+    if (client != null) {
+      clientsDB.patch({ id: client.id }, { balance: client.balance + amount });
+    }
+  });
+
+  return sessionsDB.patch({ id: session.id }, updates);
 };
 
 module.exports = {
@@ -81,5 +111,6 @@ module.exports = {
   extendSession,
   findSession,
   createSession,
-  getSessionPublicInfo
+  getSessionPublicInfo,
+  resolveSession,
 };
