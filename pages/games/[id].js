@@ -6,6 +6,7 @@ import Input from "../../components/Input.js";
 import Button from "../../components/Button.js";
 import Link from "next/link.js";
 import { useRecord } from "../../support/useRecord.js";
+import { addGamesHistory } from "../../support/game.utils.js";
 
 const getStorage = () => {
   return localStorage;
@@ -35,6 +36,7 @@ export default function GamePage({ id, defaultState, apiDomain }) {
 
   useEffect(() => {
     setPlayerId(getCachedPlayer());
+    addGamesHistory(id);
   }, []);
 
   const handleJoin = useCallback(
@@ -336,6 +338,7 @@ export default function GamePage({ id, defaultState, apiDomain }) {
 
   return (
     <main className="w-full p-1 flex col gap-2 items-center">
+      <Link href="/games" className="w-full">go home</Link>
       <div className="w-full flex col gap-1">
         <h3>Rules:</h3>
         <p>
