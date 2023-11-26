@@ -3,10 +3,6 @@
   const COMPANY_ID = "__COMPANY_ID__";
   let PLAYER_ID = null;
 
-  const getStorage = () => {
-    return localStorage;
-  };
-
   const joinPath = (path) => {
     let url = `${API_DOMAIN}/api/${path.replace(/^\//, "")}`;
 
@@ -35,461 +31,517 @@
     });
   };
 
-  const AUTH_KEY = "_auth_token";
+  const USER_STORAGE_KEY = "_auth_token";
 
-  const STAGES = {
-    connectionError: 'connection-error',
-    initial: "initial",
-    pending: "pending",
-    ended: "ended",
+  const getStorage = () => {
+    return localStorage;
   };
 
-  class Client {
-    playerId;
-    sessionId;
-    authToken;
-    user;
-    stage;
+  const setUserToken = (token) => {
+    return getStorage().setItem(
+      USER_STORAGE_KEY,
+      typeof token === "object" ? JSON.stringify(token) : token
+    );
+  };
 
-    pullRequest;
+  const getUserToken = () => {
+    const record = getStorage().getItem(USER_STORAGE_KEY);
 
-    element;
+    try {
+      return JSON.parse(record);
+    } catch (err) {
+      return null;
+    }
+  };
 
-    constructor() {}
+  const SESSION_STATUS_TYPES = {
+    // not started
+    draft: "pending",
+    // all bids accepted or declined
+    closed: "closed",
+    // resolved
+    closed: "resolved",
+  };
 
-    canListen() {
-      return [STAGES.initial, STAGES.pending].includes(this.stage);
+  const USER_STATUS_TYPES = {
+    // not connected or no bid posted
+    draft: "draft",
+    // there is a bid request from opponent
+    request: "request",
+    // you have a bid posted
+    pending: "pending",
+    // all bids accepted or declined
+    locked: "locked",
+  };
+
+  class UIComponent {
+    id = "contest-ui";
+    containerElement;
+
+    constructor() {
+      this.containerElement = document.getElementById(this.id);
+
+      if (!this.containerElement) {
+        this.containerElement = document.createElement("div");
+        this.containerElement.setAttribute("id", this.id);
+
+        this.containerElement.setAttribute(
+          "style",
+          `position: fixed; top: 0; right: 0; font-size: 12px;`
+        );
+      }
     }
 
-    logged() {
-      return this.user != null && this.user.id != null;
+    clear() {
+      if (this.containerElement) {
+        this.containerElement.innerHTML = "";
+      }
     }
 
-    setup(playerId, sessionId) {
-      this.playerId = playerId;
-      this.sessionId = sessionId;
+    createPopup(parent) {
+      const coverEl = document.createElement("div");
 
-      this.stage = STAGES.initial;
-      const elemId = 'contest-client-output';
+      const handleClose = () => {
+        coverEl.remove();
+      };
 
-      this.element = document.getElementById(elemId) || document.createElement("div");
-      this.element.setAttribute('id', elemId);
+      coverEl.onclick = (e) => {
+        handleClose();
+      };
 
-      try {
-        this.authToken = JSON.parse(getStorage().getItem(AUTH_KEY));
-      } catch (err) {}
+      coverEl.classList.add(`${this.id}_popup`);
+      coverEl.setAttribute(
+        "style",
+        `
+          position: fixed; top: 0; left: 0; 
+          width: 100vw; height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center; 
+          background: rgba(0,0,0,0.4);
+        `
+      );
 
-      this.sync();
+      const contentEl = document.createElement("div");
+      contentEl.onclick = (e) => {
+        e.stopPropagation();
+      };
+
+      contentEl.classList.add(`${this.id}_popup-content`);
+      contentEl.setAttribute(
+        "style",
+        `
+          position: relative; 
+          width: fit-content;
+          padding: 2rem;
+          max-width: 80vw;
+          background: white;
+          color: black;
+        `
+      );
+
+      const contentCloseEl = document.createElement("span");
+      contentCloseEl.setAttribute(
+        "style",
+        `
+          position: absolute; 
+          font-size: 0.8rem;
+          padding: 0.2rem;
+          right: 0;
+          top: 0;
+        `
+      );
+      contentCloseEl.innerText = "close";
+      contentCloseEl.onclick = (e) => {
+        handleClose();
+      };
+      contentEl.append(contentCloseEl);
+
+      coverEl.append(contentEl);
+
+      parent.append(coverEl);
+
+      return contentEl;
     }
 
-    listen() {
-      const _self = this;
+    createButton(parent, text, handler) {
+      const el = document.createElement("button");
 
-      if (this.abortController?.abort) {
-        this.abortController.abort();
+      el.classList.add(`${this.id}_button`);
+      el.setAttribute(
+        "style",
+        `padding: 0.5em 2em; background: black; color: white;`
+      );
+
+      el.innerText = text;
+
+      el.onclick = handler;
+
+      parent.append(el);
+
+      return el;
+    }
+
+    createText(parent, text) {
+      const el = document.createElement("p");
+
+      el.classList.add(`${this.id}_text`);
+
+      el.innerText = text;
+
+      parent.append(el);
+
+      return el;
+    }
+
+    createForm(parent, fields, onSubmit) {
+      const el = document.createElement("form");
+      el.setAttribute(
+        "style",
+        `
+          padding: 1rem;
+          display: flex; flex-direction: column;
+          gap: 1rem;
+        `
+      );
+
+      el.classList.add(`${this.id}_form`);
+
+      el.onsubmit = (e) => {
+        e.preventDefault();
+
+        const fieldNames = fields.map(({ field }) => field);
+        const formData = new FormData(e.target);
+
+        const data = fieldNames.reduce((res, field) => {
+          return {
+            ...res,
+            [field]: formData.get(field),
+          };
+        }, {});
+
+        onSubmit(e, data);
+      };
+
+      fields.forEach(({ field, defaultValue, ...other }) => {
+        const fieldEl = document.createElement("input");
+
+        fieldEl.setAttribute("name", field);
+        fieldEl.setAttribute("id", field);
+
+        if (defaultValue != null) {
+          fieldEl.defaultValue = defaultValue;
+        }
+
+        Object.entries(other).forEach(([key, value]) => {
+          fieldEl.setAttribute(key, value);
+        });
+
+        el.append(fieldEl);
+      });
+
+      this.createButton(el, "Submit");
+
+      parent.append(el);
+
+      return el;
+    }
+
+    createBitPopup(parent, { userToken, state }, onSubmit) {
+      const popupContent = this.createPopup(parent);
+
+      const fields = [
+        {
+          field: "email",
+          type: "email",
+          required: "required",
+          placeholder: "Email",
+          defaultValue: userToken?.email,
+        },
+        {
+          field: "password",
+          type: "password",
+          required: "required",
+          placeholder: "Password",
+        },
+        {
+          field: "bid",
+          type: "number",
+          required: "required",
+          placeholder: "Bid",
+          defaultValue: state?.bid,
+        },
+      ];
+
+      this.createForm(popupContent, fields, (e, data) => {
+        onSubmit(data, (error) => {
+          if (error) {
+          } else {
+            popupContent.parentElement.onclick();
+          }
+        });
+      });
+    }
+
+    render({ sessionId, userToken, state }) {
+      if (this.containerElement.parentNode == null) {
+        document.body.append(this.containerElement);
       }
 
-      if (!_self.canListen()) {
+      this.clear();
+
+      console.log(state);
+
+      if (state == null) {
         return;
       }
 
-      const handleError = (err) => {
-        if (_self.canListen()) {
-          _self.listen();
+      const userStatus = state.userState?.status || USER_STATUS_TYPES.draft;
+
+      const handleSubmitBid = async (data, callback) => {
+        console.log("bid form data", data);
+
+        const user = await get(
+          `users/search?email=${data.email}&password=${data.password}`
+        )
+          .then((res) => res.json())
+          .then((res) => {
+            setUserToken(res);
+            return res;
+          })
+          .catch((err) => {
+            callback(err.massage);
+
+            return null;
+          });
+
+        if (user?.id) {
+          post(`sessions/${sessionId}/bids`, null, {
+            userId: user.id,
+            value: data.bid,
+            autoActivation: true,
+          })
+            .then((res) => {
+              callback(null);
+            })
+            .catch((err) => {
+              callback(err.massage);
+            });
         }
       };
 
-      try {
-        const abortController = new AbortController();
-        _self.set("abortController", abortController);
+      switch (state.status) {
+        // session is not started
+        case SESSION_STATUS_TYPES.draft: {
+          switch (userStatus) {
+            // user not logged or connected
+            case USER_STATUS_TYPES.draft: {
+              const handleClick = this.createBitPopup.bind(
+                this,
+                this.containerElement,
+                { userToken, state },
+                handleSubmitBid
+              );
 
-        get(`sessions/${this.sessionId}/listen`, {
-          signal: abortController.signal,
-        })
-          .then((res) => {
-            switch(res.status) {
-              case 404: {
-                _self.set('stage', STAGES.ended);
-
-                return { error: 'no connection' };
+              if (state.bid) {
+                this.createText(
+                  this.containerElement,
+                  `current bid is ${state.bid}`
+                );
               }
-              default: {
-                return res.json();
-                break;
-              }
+
+              this.createButton(this.containerElement, "contest", () =>
+                handleClick()
+              );
+              break;
             }
-          })
-          .then((session) => {
-            _self.set("session", session, true);
-          })
-          .catch(err => {
-            if (err.message.includes('Failed to fetch')) {
-              _self.set('session', null);
-              _self.set('stage', STAGES.connectionError, true);
+            case USER_STATUS_TYPES.pending: {
+              this.createText(
+                this.containerElement,
+                `waiting for ${state.bid || ""} response`
+              );
+
+              break;
             }
+            case USER_STATUS_TYPES.locked: {
+              this.createText(
+                this.containerElement,
+                `${state.bid || ""} is locked`
+              );
 
-            return err;
-          })
-          .finally(() => {
-            _self.listen();
-            _self.set("abortController", null);
-          });
-      } catch (err) {
-        handleError(err);
-      }
-    }
-
-    ask(label, validate = null, format = null) {
-      const answer = prompt(label);
-
-      if (validate && !validate(answer)) {
-        return this.ask(label, validate);
-      }
-
-      return format ? format(answer) : answer;
-    }
-
-    getSessionBid() {
-      return Number(this.session?.bid);
-    }
-
-    getUserBid() {
-      const user = this.user;
-
-      if (user == null) {
-        return null;
-      }
-
-      const sessionUsers = this.session?.users || [];
-      const userIndex = sessionUsers.findIndex((it) => {
-        return it.id === user.id;
-      });
-      const inSession = userIndex !== -1;
-
-      if (!inSession) {
-        return null;
-      }
-
-      return Number(sessionUsers[userIndex]?.bid);
-    }
-
-    getUserBidState() {
-      const bid = Number(this.getUserBid());
-
-      return !Number.isNaN(bid) && bid > 0;
-    }
-
-    getBidState() {
-      const sessionBid = this.getSessionBid();
-
-      if (Number.isNaN(sessionBid) && sessionBid !== 0) {
-        return false;
-      }
-
-      const userBid = this.getUserBid();
-
-      if (!userBid) {
-        return true;
-      }
-
-      return userBid !== sessionBid;
-    }
-
-    validate() {
-      const hasBidRequest = this.getBidState();
-      
-      this.pendingBid = hasBidRequest ? false : this.pendingBid;
-
-      if (hasBidRequest || this.pendingBid) {
-        this.pendingBid = false;
-        this.handleSendBid();
-      }
-    }
-
-    set(key, value, shouldRender = false) {
-      this[key] = value;
-
-      switch (key) {
-        case "session": {
-          switch (value?.status) {
-            case "active":
-            case "resolved": {
-              this.set("stage", STAGES.ended, true);
               break;
             }
             default: {
-              this.set(
-                "stage",
-                this.logged() ? STAGES.pending : STAGES.initial,
-                true
-              );
-              break;
             }
           }
           break;
         }
-      }
-
-      if (shouldRender) {
-        this.render();
-      }
-    }
-
-    async auth() {
-      if (this.authToken != null) {
-        const useCached = confirm(
-          `Continue as ${this.authToken.name || this.authToken.email}?`
-        );
-
-        this.set("user", useCached ? this.authToken : null);
-
-        this.validate();
-      }
-
-      if (this.user == null || !this.user.id) {
-        const email = this.ask("Email", (res) => !!res.trim());
-        const password = this.ask("password", (res) => !!res.trim());
-
-        this.set("loading", true, true);
-
-        const user = await post("login", null, { email, password })
-          .then((res) => res.json())
-          .then((user) => {
-            getStorage().setItem(AUTH_KEY, JSON.stringify(user));
-
-            return user;
-          })
-          .catch((err) => {
-            return {
-              error: err.message,
-            };
-          });
-
-        this.set("user", user);
-
-        this.validate();
-
-        this.set("loading", false, true);
-      }
-
-      this.connect();
-    }
-
-    handleSendBid() {
-      const _self = this;
-      const value = this.ask("What is your Bid?", (bid) => true);
-
-      if (!value || !this.user) {
-        return;
-      }
-
-      const body = {
-        value: Number(value),
-        userId: _self.user.id,
-        autoActivation: true,
-      };
-
-      post(`sessions/${this.sessionId}/bids`, null, body);
-    }
-
-    async sync() {
-      const session = await get(`sessions/${this.sessionId}`)
-        .then((res) => res.json())
-        .catch((err) => {
-          return null;
-        });
-
-      this.set("session", session, true);
-
-      this.listen();
-
-      this.render();
-    }
-
-    async connect() {
-      const user = this.user;
-
-      if (!user?.id) {
-        return this.set("stage", STAGES.initial, true);
-      }
-
-      const sessionId = this.sessionId;
-
-      const session = await post(`sessions/${sessionId}/users`, null, {
-        id: user?.id,
-        playerId: PLAYER_ID,
-      })
-        .then((res) => res.json())
-        .catch((err) => {
-          return null;
-        });
-
-      this.set("session", session, true);
-
-      this.validate();
-    }
-
-    render() {
-      const _self = this;
-      if (this.element.parentNode == null) {
-        document.body.append(this.element);
-      }
-
-      this.element.innerHTML = "";
-
-      if (!this.visibility) {
-        return;
-      }
-
-      let contentEl = null;
-
-      if (this.loading) {
-        contentEl = document.createElement("p");
-        contentEl.innerText = "Loading";
-      } else {
-        const bid = Number(this.session?.bid);
-        const hasBidRequest = this.getBidState();
-        const hasBidPosted = this.getUserBidState();
-        const canPostBid = hasBidRequest || !hasBidPosted;
-
-        switch (this.stage) {
-          case STAGES.initial: {
-            contentEl = document.createElement("button");
-            contentEl.innerText = hasBidRequest
-              ? `Current Bid is "${bid}". You In?`
-              : hasBidPosted
-              ? "waiting for opponent..."
-              : "Bid On";
-            contentEl.onclick = () => {
-              _self.pendingBid = !hasBidRequest;
-
-              _self.auth();
-            };
-            break;
-          }
-          case STAGES.pending: {
-            contentEl = document.createElement(canPostBid ? "button" : "p");
-            contentEl.innerText = hasBidRequest
-              ? `Opponent bet "${bid}". Respond?`
-              : hasBidPosted
-              ? "waiting for opponent..."
-              : "Bid On";
-
-            if (canPostBid) {
-              contentEl.onclick = this.handleSendBid.bind(this);
-            }
-            break;
-          }
-          case STAGES.connectionError: {
-            // contentEl = document.createElement("button");
-            // contentEl.innerText = "Oops. Connection error. Reconnect?";
-
-            // contentEl.onclick = () => {
-            //   location.pathname = location.pathname;
-            // };
-
-            break;
-          }
-          default: {
-            contentEl = document.createElement('span');
-            contentEl.innerText = 'all bids accepted!';
-          }
+        case SESSION_STATUS_TYPES.pending: {
+        }
+        default: {
         }
       }
-
-      if (contentEl) {
-        this.element.append(contentEl);
-      }
-
-      // const debugEl = document.createElement("i");
-      // debugEl.setAttribute("style", ``);
-      // debugEl.innerHTML = JSON.stringify(this.session);
-      // this.element.append(debugEl);
     }
   }
 
-  const parsePath = (path) => {
-    const parts = path.split("/");
-
-    const connectionId = parts.slice(-1)[0];
-
-    return { parts, connectionId };
-  };
-
-  const el = document.currentScript;
-  const { connectionId } = parsePath(location.pathname);
-
-  let _client = new Client();
-
-  const startClient = (sessionId) => {
-    _client.setup(PLAYER_ID, sessionId);
-  };
-
-  const createSession = () => {
-    post(`connections/${COMPANY_ID}/${connectionId}`)
-      .then((res) => res.json())
-      .then(({ error, sessionId }) => {
-        if (!sessionId) {
-          return;
-        }
-
-        startClient(sessionId);
-      })
-      .catch((err) => {});
-  };
-
-  const getSession = () => {
-    get(`connections/${COMPANY_ID}/${connectionId}`)
-      .then((res) => res.json())
-      .then(({ error, sessionId }) => {
-        if (!sessionId) {
-          return createSession();
-        }
-
-        startClient(sessionId);
-      })
-      .catch((err) => {});
-  };
-
-  class Contest {
-    playerId;
-    connectionId;
+  class ContestClient {
     companyId;
-    connected = false;
-    
-    constructor(connectionId) {
+    playerId;
+    userId;
+    connectionId;
+    sessionId;
+
+    userToken;
+
+    state;
+    active;
+
+    ui;
+
+    constructor() {
       this.companyId = COMPANY_ID;
-      this.connectionId = connectionId;
+
+      const token = getUserToken();
+
+      if (token != null) {
+        this.setKey("userToken", token);
+      }
+
+      this.ui = new UIComponent();
     }
 
-    connect(playerId) {
-      if (playerId == null || this.connected) {
+    async connect(connectionId, playerId) {
+      this.connectionId = connectionId;
+      this.playerId = playerId;
+
+      if (connectionId == null || playerId == null) {
         return false;
       }
 
-      PLAYER_ID = playerId;
+      this.setKey("active", true);
 
-      this.playerId = playerId;
+      const body = {
+        playerId: this.playerId,
+        userId: this.userId,
+        ownerId: COMPANY_ID,
+      };
 
-      this.connected = true;
+      const _state = await post(
+        `connections/${connectionId}/participants`,
+        null,
+        body
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          return res || null;
+        })
+        .catch((err) => {
+          return null;
+        });
 
-      getSession();
+      this.sessionId = _state?.id || null;
+
+      this.setKey("state", _state);
+
+      if (_state == null) {
+        return;
+      }
+
+      this.sync();
+    }
+
+    setRecord(record) {
+      const _callback = this.setKey;
+      const entries = Object.entries(record);
+
+      entries.forEach(([key, value]) => _callback(key, value));
+    }
+
+    setKey(key, value) {
+      const hasChange = JSON.stringify(this[key]) !== JSON.stringify(value);
+
+      this[key] = value;
+
+      switch (key) {
+        case "userToken": {
+          if (value && value?.id) {
+            this.userId = value.id;
+          }
+
+          break;
+        }
+        case "active": {
+          this.render();
+          break;
+        }
+        case "state": {
+          if (!hasChange) {
+            return;
+          }
+
+          this.render();
+
+          if (value?.status != SESSION_STATUS_TYPES.closed) {
+            this.sync();
+          }
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
+    async sync() {
+      const { userId, sessionId } = this;
+
+      if (this.sessionId == null) {
+        return;
+      }
+
+      const _state = await get(`sessions/${sessionId}/listen?userId=${userId}`)
+        .then((res) => {
+          if (res.status < 400) {
+            return res.json();
+          } else {
+            return res;
+          }
+        })
+        .catch((err) => {
+          return null;
+        });
+
+      if (_state != null) {
+        this.setKey("state", _state);
+      }
+    }
+
+    json() {
+      return Object.assign({}, this);
+    }
+
+    render() {
+      if (this.state != null && this.active) {
+        this.ui.render(this.json());
+      } else {
+        this.ui.clear();
+      }
     }
   }
 
-  const _contest = new Contest(connectionId);
+  let _contest = new ContestClient();
 
-  window.Contest = {
-    show: () => {
-      _client.set('visibility', true, true);
-    },
-    hide: () => {
-      _client.set('visibility', false, true);
-    },
-    connect: (playerId) => {
-      console.info('Contest - Connect', { playerId });
-
-      _contest.connect(playerId);
-    }
-  };
+  try {
+    window.Contest = {
+      show: () => {
+        _contest?.setKey("active", true);
+      },
+      hide: () => {
+        _contest?.setKey("active", false);
+      },
+      connect: (connectionId, playerId) => {
+        _contest.connect(connectionId, playerId);
+      },
+    };
+  } catch (err) {}
 })();

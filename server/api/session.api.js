@@ -8,6 +8,7 @@ const {
   SESSION_NAMINGS,
   createSession,
   resolveSession,
+  getUserSessionState,
 } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
@@ -215,10 +216,13 @@ const init = (app) => {
 
   app.get("/api/sessions/:sessionId/listen", (req, res) => {
     const sessionId = req.params.sessionId;
+    const { userId } = req.query || {};
+
+    // req.setTimeout(5000);
 
     emitter.once(EVENT_TYPES.STATE, ({ id, state }) => {
       if (sessionId == id) {
-        res.json(state);
+        res.json(getUserSessionState(state, userId));
       }
     });
   });

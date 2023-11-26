@@ -134,7 +134,7 @@ class Game {
     const playersNum = this.players?.length || 0;
 
     this.minValue = this.minValue || 0;
-    this.maxValue = playersNum > 2 ? 100 : 10;
+    this.maxValue = playersNum > 3 ? 100 : 10;
 
     const stateValues = Object.values(this.state || {});
 

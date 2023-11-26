@@ -21,7 +21,7 @@ export const Login = ({ apiDomain }) => {
   const { logged, user, setToken } = useAuth();
   const [isLogin, setLoginState] = useState(true);
   const [loading, response, error, handleLogin, reset] = useApi(
-    (body) => isLogin ? login(apiDomain, body) : signup(apiDomain, body),
+    (body) => (isLogin ? login(apiDomain, body) : signup(apiDomain, body)),
     true
   );
 

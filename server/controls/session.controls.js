@@ -9,6 +9,62 @@ const SESSION_NAMINGS = {
   status: "status",
 };
 
+const SESSION_STATUS_TYPES = {
+  // not started
+  draft: "pending",
+  // all bids accepted or declined
+  closed: "closed",
+  // resolved
+  closed: "resolved",
+};
+
+const USER_STATUS_TYPES = {
+  // not connected or no bid posted
+  draft: "draft",
+  // there is a bid request from opponent
+  request: "request",
+  // you have a bid posted
+  pending: "pending",
+  // all bids accepted or declined
+  locked: "locked",
+};
+
+class Session {
+  constructor(data) {
+    Object.assign(this, data);
+  }
+
+  getParticipant(id) {
+    const _arr = this[SESSION_NAMINGS.clients];
+
+    if (!Array.isArray(_arr)) {
+      return null;
+    }
+
+    return _arr.find((it) => it.id === id);
+  }
+
+  hasParticipant(participantId) {
+    return this.getParticipant(participantId) != null;
+  }
+
+  addParticipant(participant) {
+    if (this.hasParticipant(participant?.id)) {
+      return false;
+    }
+
+    if (this[SESSION_NAMINGS.clients] == null) {
+      this[SESSION_NAMINGS.clients] = [];
+    }
+
+    this[SESSION_NAMINGS.clients].push(participant);
+  }
+
+  json() {
+    return Object.assign({}, this);
+  }
+}
+
 const getSessionClients = (session) => {
   if (!session) {
     return [];
@@ -78,7 +134,7 @@ const getSessionPublicInfo = (id) => {
 const resolveSession = (sessionQuery, participants) => {
   const session = findSession(sessionQuery);
 
-  if (!session || session.status === 'resolved') {
+  if (!session || session.status === "resolved") {
     return session;
   }
 
@@ -87,7 +143,7 @@ const resolveSession = (sessionQuery, participants) => {
   const amount = summary / winners.length;
 
   const updates = {
-    [SESSION_NAMINGS.status]: 'resolved',
+    [SESSION_NAMINGS.status]: "resolved",
     [SESSION_NAMINGS.results]: {
       [SESSION_NAMINGS.clients]: participants,
       amount,
@@ -105,8 +161,82 @@ const resolveSession = (sessionQuery, participants) => {
   return sessionsDB.patch({ id: session.id }, updates);
 };
 
+const addSessionParticipant = (sessionId, participant) => {
+  const sessionData = findSession({ id: sessionId });
+
+  if (!sessionData) {
+    return sessionData;
+  }
+
+  const session = new Session(sessionData);
+
+  if (session.hasParticipant(participant?.id)) {
+    return sessionData;
+  }
+
+  session.addParticipant(participant);
+
+  return sessionsDB.patch({ id: session.id }, session.json());
+};
+
+const getUserSessionState = (sessionData, participantId) => {
+  const session = new Session(sessionData);
+
+  const participantRecord = session.getParticipant(participantId);
+  const inSession = participantRecord != null;
+
+  if (!inSession) {
+    return Object.assign({}, sessionData, {
+      userState: {
+        status: USER_STATUS_TYPES.draft,
+      },
+    });
+  }
+
+  let userStatus = USER_STATUS_TYPES.draft;
+
+  const bid = participantRecord[SESSION_NAMINGS.bidValue];
+
+  const hasBid = bid != null;
+  const sessionBid = session[SESSION_NAMINGS.bidValue];
+  const hasBidRequest = sessionBid != null && sessionBid != bid;
+
+  switch (session.status) {
+    case SESSION_STATUS_TYPES.draft: {
+      if (hasBidRequest) {
+        userStatus = USER_STATUS_TYPES.request;
+      } else if (hasBid) {
+        userStatus = USER_STATUS_TYPES.pending;
+      }
+
+      break;
+    }
+    case SESSION_STATUS_TYPES.closed: {
+      break;
+    }
+    default: {
+      userStatus = USER_STATUS_TYPES.locked;
+    }
+  }
+
+  const userState =
+    participantId == null
+      ? null
+      : {
+          id: participantId,
+          status: userStatus,
+          bid
+        };
+
+  return Object.assign({}, sessionData, { userState });
+};
+
 module.exports = {
   SESSION_NAMINGS,
+
+  addSessionParticipant,
+  getUserSessionState,
+
   getSessionClients,
   extendSession,
   findSession,

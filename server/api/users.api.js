@@ -69,6 +69,27 @@ const init = (app) => {
     res.status(200).json(_client);
   });
 
+  app.get("/api/users/search", async (req, res) => {
+    try {
+      const { email, passowrd } = req.query;
+
+      const client = clientsDB.find({ email, passowrd });
+      const hasMatch = client != null;
+
+      if (!hasMatch) {
+        return res.status(404).json({ error: "No match" });
+      }
+
+      const json = extendClient(client);
+
+      res.status(200).json(getUsersPublicInfo(json));
+    } catch (err) {
+      console.log({ err });
+      
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   app.get("/api/users/:id", async (req, res) => {
     try {
       const id = req.params.id;

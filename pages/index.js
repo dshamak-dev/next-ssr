@@ -29,9 +29,12 @@ export const Index = () => {
           <span>make everything</span>
           <span>{_words[wordIndex]}</span>
         </h1>
-        <Link href="/login" className={styles.link}>
-          Login
-        </Link>
+        <div className="flex gap-1 items-center">
+          <Link href="/login" className={styles.link}>
+            Login
+          </Link>
+          <Link href="/games" className={styles.link}>Games</Link>
+        </div>
       </main>
     </>
   );

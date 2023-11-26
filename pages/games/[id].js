@@ -13,6 +13,7 @@ const getStorage = () => {
 };
 
 const STORAGE_KEY = "_player_id";
+const COMPANY_ID = "the_lime_pen";
 
 const getCachedPlayer = () => {
   return getStorage().getItem(STORAGE_KEY);
@@ -153,7 +154,7 @@ export default function GamePage({ id, defaultState, apiDomain }) {
       return null;
     }
 
-    if (!['draft', 'loading'].includes(gameState?.status)) {
+    if (!["draft", "loading"].includes(gameState?.status)) {
       return null;
     }
 
@@ -325,20 +326,36 @@ export default function GamePage({ id, defaultState, apiDomain }) {
 
     try {
       if (window.Contest == null) {
-      } else if (['draft', 'loading'].includes(gameState?.status)) {
-        window.Contest.connect(playerId);
+      } else if (["draft", "loading"].includes(gameState?.status)) {
+        const parsePath = (path) => {
+          const parts = path.split("/");
+
+          const connectionId = parts.slice(-1)[0];
+
+          return { parts, connectionId };
+        };
+
+        const { connectionId } = parsePath(location.pathname);
+
+        window.Contest.connect(connectionId, playerId);
         window.Contest.show();
       } else {
         window.Contest.hide();
       }
-    } catch (err) {
+    } catch (err) {}
 
-    }
+    return () => {
+      try {
+        window.Contest?.hide();
+      } catch (err) {}
+    };
   }, [playerId, gameState]);
 
   return (
     <main className="w-full p-1 flex col gap-2 items-center">
-      <Link href="/games" className="w-full">go home</Link>
+      <Link href="/games" className="w-full">
+        go home
+      </Link>
       <div className="w-full flex col gap-1">
         <h3>Rules:</h3>
         <p>
@@ -365,7 +382,10 @@ export default function GamePage({ id, defaultState, apiDomain }) {
       </div>
       {playersListContent}
       <div className="flex col w-full items-center gap-1">{content}</div>
-      <script defer src={`${apiDomain}/contest/client?company=23ed84`}></script>
+      <script
+        fetchpriority="hight"
+        src={`${apiDomain}/contest/client?company=${COMPANY_ID}`}
+      ></script>
     </main>
   );
 }
