@@ -113,6 +113,8 @@ class Game {
 
     this.players.push(playerId);
 
+    this.setReadyState(playerId, false);
+
     this.validate();
 
     return true;

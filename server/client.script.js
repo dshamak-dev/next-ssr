@@ -59,6 +59,7 @@
     draft: "pending",
     // all bids accepted or declined
     closed: "closed",
+    active: "active",
     // resolved
     closed: "resolved",
   };
@@ -330,19 +331,19 @@
         }
       };
 
+      const handleContestClick = this.createBitPopup.bind(
+        this,
+        this.containerElement,
+        { userToken, state },
+        handleSubmitBid
+      );
+
       switch (state.status) {
         // session is not started
         case SESSION_STATUS_TYPES.draft: {
           switch (userStatus) {
             // user not logged or connected
             case USER_STATUS_TYPES.draft: {
-              const handleClick = this.createBitPopup.bind(
-                this,
-                this.containerElement,
-                { userToken, state },
-                handleSubmitBid
-              );
-
               if (state.bid) {
                 this.createText(
                   this.containerElement,
@@ -351,7 +352,7 @@
               }
 
               this.createButton(this.containerElement, "contest", () =>
-                handleClick()
+                handleContestClick()
               );
               break;
             }
@@ -361,6 +362,17 @@
                 `waiting for ${state.bid || ""} response`
               );
 
+              break;
+            }
+            case USER_STATUS_TYPES.request: {
+              this.createText(
+                this.containerElement,
+                `current bid is ${state.bid}`
+              );
+
+              this.createButton(this.containerElement, "contest?", () =>
+                handleContestClick()
+              );
               break;
             }
             case USER_STATUS_TYPES.locked: {
@@ -376,7 +388,17 @@
           }
           break;
         }
-        case SESSION_STATUS_TYPES.pending: {
+        case SESSION_STATUS_TYPES.active: {
+          switch (userStatus) {
+            case USER_STATUS_TYPES.locked: {
+              this.createText(
+                this.containerElement,
+                `${state.bid || ""} is locked`
+              );
+
+              break;
+            }
+          }
         }
         default: {
         }
@@ -495,11 +517,35 @@
     async sync() {
       const { userId, sessionId } = this;
 
+      if (this.abortController) {
+        this.abortController.abort();
+        this.abortController = null;
+      }
+
       if (this.sessionId == null) {
         return;
       }
 
-      const _state = await get(`sessions/${sessionId}/listen?userId=${userId}`)
+      const now = Date.now();
+      const timePassed = this.lastRequest ? now - this.lastRequest : now;
+
+      if (timePassed < 1000) {
+        // connection error
+        return;
+      }
+
+      this.lastRequest = now;
+
+      const abortController = new AbortController();
+
+      this.abortController = abortController;
+
+      const _state = await get(
+        `sessions/${sessionId}/listen?userId=${userId}`,
+        {
+          signal: abortController.signal,
+        }
+      )
         .then((res) => {
           if (res.status < 400) {
             return res.json();
@@ -511,8 +557,12 @@
           return null;
         });
 
+      this.abortController = null;
+
       if (_state != null) {
         this.setKey("state", _state);
+      } else {
+        this.sync();
       }
     }
 

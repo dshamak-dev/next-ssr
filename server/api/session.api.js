@@ -9,6 +9,7 @@ const {
   createSession,
   resolveSession,
   getUserSessionState,
+  addSessionParticipant,
 } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
@@ -95,7 +96,7 @@ const init = (app) => {
     const { userId, value, autoActivation = false } = req.body;
     const clientBid = Number(value) || 0;
 
-    const session = sessionsDB.find({ id: sessionId });
+    let session = sessionsDB.find({ id: sessionId });
     const hasMatch = session != null;
 
     if (!hasMatch) {
@@ -108,7 +109,8 @@ const init = (app) => {
     const hasClientMatch = clientIndex !== -1;
 
     if (!hasClientMatch) {
-      return res.status(404).json({ error: "No such client" });
+      session = addSessionParticipant(session.id, { id: userId });
+      // return res.status(404).json({ error: "No such client" });
     }
 
     const sessionBid = Number(session[SESSION_NAMINGS.bidValue]) || 0;
@@ -140,10 +142,11 @@ const init = (app) => {
     }
 
     const _updated = sessionsDB.patch({ id: sessionId }, updateFields);
+    const extended = extendSession(_updated);
 
-    triggerSessionUpdate(sessionId, extendSession(_updated));
+    triggerSessionUpdate(sessionId, extended);
 
-    res.status(200).json({ ok: true });
+    res.status(200).json(extended);
   });
 
   app.put("/api/sessions/:sessionId", (req, res) => {
