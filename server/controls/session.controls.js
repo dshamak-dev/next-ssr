@@ -175,11 +175,7 @@ const resolveSession = (sessionQuery, participants) => {
   };
 
   winners.forEach(({ state, id, ...props }) => {
-    const client = clientsDB.find({ id });
-
-    if (client != null) {
-      clientsDB.patch({ id: client.id }, { balance: client.balance + amount });
-    }
+    requestClientTransaction(id, {sessionId: session.id, value: amount})
   });
 
   return sessionsDB.patch({ id: session.id }, updates);

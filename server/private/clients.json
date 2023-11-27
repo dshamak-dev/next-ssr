@@ -1,1 +1,81 @@
-[{"name":"Dmitrysh","id":"1a4bfe6d","type":0,"email":"dmitry.shamak.dev@gmail.com","password":"1111","balance":-50,"history":["0b41cc5a","4af77a1d","6dc8de89","7a710153","d0a7b23c"]},{"name":"User 1","id":"930c79aa","type":0,"email":"user1@m.co","password":"1111","balance":10,"history":["52e531de","4af77a1d","6dc8de89","7a710153","cf1675d3","86aa1881","e5e37f52"]},{"name":"User 2","id":"2d3090fb","type":0,"email":"user2@m.co","password":"1111","balance":20,"history":["0b41cc5a","52e531de","b03ac342","cf1675d3","86aa1881","e5e37f52"]}]
+[
+  {
+    "name": "Dmitrysh",
+    "id": "1a4bfe6d",
+    "type": 0,
+    "email": "dmitry.shamak.dev@gmail.com",
+    "password": "1111",
+    "balance": 450,
+    "history": [
+      "0b41cc5a",
+      "4af77a1d",
+      "6dc8de89",
+      "7a710153",
+      "d0a7b23c",
+      "f1d24a24",
+      "37152266",
+      "6ee366a3"
+    ],
+    "transactions": [
+      { "sessionId": "21c4f395", "value": -50 },
+      { "id": 1701077694678, "sessionId": "6ee366a3", "value": -100 },
+      { "id": 1701077698114, "sessionId": "6ee366a3", "value": 200 }
+    ]
+  },
+  {
+    "name": "User 1",
+    "id": "930c79aa",
+    "type": 0,
+    "email": "user1@m.co",
+    "password": "1111",
+    "balance": 0,
+    "history": [
+      "52e531de",
+      "4af77a1d",
+      "6dc8de89",
+      "7a710153",
+      "cf1675d3",
+      "86aa1881",
+      "e5e37f52",
+      "9e7c33cf",
+      "0bbf9633",
+      "544bda38",
+      "455b049e",
+      "ad925eff",
+      "6ee366a3"
+    ],
+    "transactions": [
+      { "sessionId": "21c4f395", "value": -50 },
+      { "id": 1701077694679, "sessionId": "6ee366a3", "value": -100 }
+    ]
+  },
+  {
+    "name": "User 2",
+    "id": "2d3090fb",
+    "type": 0,
+    "email": "user2@m.co",
+    "password": "1111",
+    "balance": 20,
+    "history": [
+      "0b41cc5a",
+      "52e531de",
+      "b03ac342",
+      "cf1675d3",
+      "86aa1881",
+      "e5e37f52",
+      "9e7c33cf",
+      "0bbf9633",
+      "544bda38",
+      "455b049e"
+    ]
+  },
+  {
+    "name": "User 3",
+    "id": "8769884e",
+    "type": 0,
+    "email": "user3@m.co",
+    "password": "1111",
+    "balance": 50,
+    "history": ["f1d24a24"]
+  }
+]
