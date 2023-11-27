@@ -326,7 +326,7 @@ export default function GamePage({ id, defaultState, apiDomain }) {
 
     try {
       if (window.Contest == null) {
-      } else if (["draft", "loading"].includes(gameState?.status)) {
+      } else {
         const parsePath = (path) => {
           const parts = path.split("/");
 
@@ -337,10 +337,22 @@ export default function GamePage({ id, defaultState, apiDomain }) {
 
         const { connectionId } = parsePath(location.pathname);
 
-        window.Contest.connect(connectionId, playerId);
-        window.Contest.show();
-      } else {
-        window.Contest.hide();
+        switch (gameState?.status) {
+          case "draft":
+          case "loading": {
+            window.Contest.connect(connectionId, playerId);
+            window.Contest.show();
+            break;
+          }
+          case "closed":
+          case "resolved": {
+            window.Contest.resolve(connectionId, gameState?.results);
+            break;
+          }
+          default: {
+            window.Contest.hide();
+          }
+        }
       }
     } catch (err) {}
 

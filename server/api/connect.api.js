@@ -38,9 +38,8 @@ module.exports = {
       res.status(200).json(getUserSessionState(session, userId));
     });
 
-    app.post("/api/connections/:companyId/:connectionId", (req, res) => {
-      const { companyId, connectionId } = req.params;
-      const ownerId = companyId;
+    app.post("/api/connections", (req, res) => {
+      const { ownerId, connectionId } = req.body;
 
       let session = findSession({ ownerId, connectionId });
 
@@ -53,8 +52,7 @@ module.exports = {
 
     app.post("/api/connections/:connectionId/resolve", (req, res) => {
       const { connectionId } = req.params;
-      const { companyId, players } = req.body || {};
-      const ownerId = companyId;
+      const { ownerId, players } = req.body || {};
 
       const participants = Object.entries(players).map(([playerId, state]) => {
         return { playerId, state };

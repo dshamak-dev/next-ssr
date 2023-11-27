@@ -197,7 +197,7 @@ class Game {
       {}
     );
 
-    Contest.resolve("23ed84", this.id, { players: results });
+    // Contest.resolve("23ed84", this.id, { players: results });
 
     this.results = results;
   }

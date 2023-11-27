@@ -570,6 +570,13 @@
       return Object.assign({}, this);
     }
 
+    resolve(connectionId, playersState) {
+      post(`connections/${connectionId}/resolve`, null, {
+        ownerId: COMPANY_ID,
+        players: playersState,
+      });
+    }
+
     render() {
       if (this.state != null && this.active) {
         this.ui.render(this.json());
@@ -591,6 +598,9 @@
       },
       connect: (connectionId, playerId) => {
         _contest.connect(connectionId, playerId);
+      },
+      resolve(connectionId, state) {
+        _contest.resolve(connectionId, state);
       },
     };
   } catch (err) {}

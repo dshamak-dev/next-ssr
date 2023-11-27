@@ -15,6 +15,7 @@ const SESSION_STATUS_TYPES = {
   // all bids accepted or declined
   closed: "closed",
   // resolved
+  resolved: "resolved",
   closed: "resolved",
 };
 
@@ -134,24 +135,46 @@ const getSessionPublicInfo = (id) => {
 const resolveSession = (sessionQuery, participants) => {
   const session = findSession(sessionQuery);
 
-  if (!session || session.status === "resolved") {
+  if (!session || session.status === SESSION_STATUS_TYPES.resolved) {
     return session;
   }
 
-  const summary = Number(session.summary) || 0;
-  const winners = participants.filter(({ state }) => state);
+  let updates = {};
+
+  let summary = Number(session.summary) || 0;
+
+  if (!summary) {
+    summary = session[SESSION_NAMINGS.clients].reduce((_sum, it) => {
+      const _bid = it[SESSION_NAMINGS.bidValue] || 0;
+
+      return _sum + _bid;
+    }, 0);
+  }
+
+  updates.summary = summary;
+
+  const winners = participants
+    .map((p) => {
+      const user = session[SESSION_NAMINGS.clients].find(
+        (it) => it.playerId === p.playerId
+      );
+
+      return {
+        ...p,
+        id: user?.id,
+      };
+    })
+    .filter(({ id, state }) => id != null && state);
   const amount = summary / winners.length;
 
-  const updates = {
-    [SESSION_NAMINGS.status]: "resolved",
-    [SESSION_NAMINGS.results]: {
-      [SESSION_NAMINGS.clients]: participants,
-      amount,
-    },
+  updates[SESSION_NAMINGS.status] = SESSION_STATUS_TYPES.resolved;
+  updates[SESSION_NAMINGS.results] = {
+    [SESSION_NAMINGS.clients]: participants,
+    amount,
   };
 
-  winners.forEach(({ state, ...props }) => {
-    const client = clientsDB.find(props);
+  winners.forEach(({ state, id, ...props }) => {
+    const client = clientsDB.find({ id });
 
     if (client != null) {
       clientsDB.patch({ id: client.id }, { balance: client.balance + amount });
@@ -225,7 +248,7 @@ const getUserSessionState = (sessionData, participantId) => {
       : {
           id: participantId,
           status: userStatus,
-          bid
+          bid,
         };
 
   return Object.assign({}, sessionData, { userState });
@@ -233,6 +256,8 @@ const getUserSessionState = (sessionData, participantId) => {
 
 module.exports = {
   SESSION_NAMINGS,
+  USER_STATUS_TYPES,
+  SESSION_STATUS_TYPES,
 
   addSessionParticipant,
   getUserSessionState,

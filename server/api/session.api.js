@@ -10,6 +10,7 @@ const {
   resolveSession,
   getUserSessionState,
   addSessionParticipant,
+  SESSION_STATUS_TYPES,
 } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
@@ -103,13 +104,19 @@ const init = (app) => {
       return res.status(404).json({ error: "No session found" });
     }
 
-    const sessionClients = getSessionClients(session);
+    if (![SESSION_STATUS_TYPES.draft].includes(session.status)) {
+      return res.status(404).json({ error: "No bids allowed" });
+    }
+
+    let sessionClients = getSessionClients(session);
     const clientIndex = sessionClients.findIndex(({ id }) => id === userId);
 
     const hasClientMatch = clientIndex !== -1;
 
     if (!hasClientMatch) {
       session = addSessionParticipant(session.id, { id: userId });
+
+      sessionClients = getSessionClients(session);
       // return res.status(404).json({ error: "No such client" });
     }
 
