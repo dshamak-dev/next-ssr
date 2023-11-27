@@ -1,5 +1,5 @@
 const { getSessionPublicInfo } = require("../controls/session.controls.js");
-const { getUsersPublicInfo } = require("../controls/user.controls.js");
+const { getUsersPublicInfo, getUserPublic } = require("../controls/user.controls.js");
 const { uid } = require("../scripts/support.js");
 const { clientsDB } = require("../scripts/tables.js");
 
@@ -101,9 +101,28 @@ const init = (app) => {
         return res.status(404).json({ error: "No match" });
       }
 
-      const json = extendClient(client);
+      // const json = extendClient(client);
 
-      res.status(200).json(getUsersPublicInfo(json));
+      res.status(200).json(getUserPublic(client.id));
+    } catch (err) {
+      console.log({ err });
+      
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/users/:id/transactions", async (req, res) => {
+    try {
+      const id = req.params.id;
+
+      const client = clientsDB.find({ id });
+      const hasMatch = client != null;
+
+      if (!hasMatch) {
+        return res.status(404).json({ error: "No match" });
+      }
+
+      res.status(200).json(client.transactions || []);
     } catch (err) {
       console.log({ err });
       

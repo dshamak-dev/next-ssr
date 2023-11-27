@@ -1,6 +1,6 @@
 const { clientsDB, sessionsDB } = require("../scripts/tables");
 const { reduceRecord, uid } = require("../scripts/support.js");
-const { getUsersPublicInfo } = require("./user.controls.js");
+const { getUsersPublicInfo, requestClientTransaction } = require("./user.controls.js");
 
 const SESSION_NAMINGS = {
   clients: "users",
@@ -13,6 +13,7 @@ const SESSION_STATUS_TYPES = {
   // not started
   draft: "pending",
   // all bids accepted or declined
+  active: "active",
   closed: "closed",
   // resolved
   resolved: "resolved",
@@ -254,6 +255,33 @@ const getUserSessionState = (sessionData, participantId) => {
   return Object.assign({}, sessionData, { userState });
 };
 
+const lockSessionBids = (sessionId) => {
+  const updates = {};
+
+  const session = findSession({ id: sessionId });
+
+  if (!session) {
+    return session;
+  }
+
+  if (![SESSION_STATUS_TYPES.draft].includes(session[SESSION_NAMINGS.status])) {
+    return session;
+  }
+
+  updates[SESSION_NAMINGS.status] = SESSION_STATUS_TYPES.active;
+
+  const clients = getSessionClients(session);
+
+  clients.forEach(({ id, bid }) => {
+    requestClientTransaction(id, {
+      sessionId: session.id,
+      value: Number(bid) * -1
+    })
+  });
+
+  return sessionsDB.patch({ id: sessionId }, updates);
+};
+
 module.exports = {
   SESSION_NAMINGS,
   USER_STATUS_TYPES,
@@ -261,6 +289,7 @@ module.exports = {
 
   addSessionParticipant,
   getUserSessionState,
+  lockSessionBids,
 
   getSessionClients,
   extendSession,

@@ -1,23 +1,30 @@
-import { useRouter } from "next/router.js";
 import Button from "./Button.js";
 import { useCallback, useState } from "react";
 import { createSession, getSession } from "../api/session.api.js";
-import Link from "next/link.js";
-import {Popup} from "./Popup.js";
+import { Popup } from "./Popup.js";
 import Form from "./Form.js";
 import Input from "./Input.js";
-import { setUserTransaction } from "../api/user.api.js";
+import { setUserTransaction, getUserTransactions } from "../api/user.api.js";
 import { useApi } from "../support/useApi.js";
 import { useNavigation } from "../support/useNavigation.js";
+import Link from "next/link.js";
 
 export default function User({ apiDomain, user }) {
   const { navigate, router } = useNavigation();
   const [_user, setUser] = useState(user || {});
   const [busy, setBusy] = useState(false);
+  const [isOpenTransactions, setOpenTransactions] = useState(false);
   const [showTransaction, setShowTransaction] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [loadingSession, session, sessionError, trigger, resetSessionAPI] =
     useApi((id) => getSession(apiDomain, id), true);
+
+  const [
+    loadingTransactions,
+    transactions,
+    transactionsError,
+    getTransactions,
+  ] = useApi((id) => getUserTransactions(apiDomain, id));
 
   const handleNavigate = useCallback(
     (path) => {
@@ -84,13 +91,22 @@ export default function User({ apiDomain, user }) {
     [apiDomain, trigger]
   );
 
+  const handleShowTransactions = useCallback(() => {
+    if (!_user.id) {
+      return;
+    }
+
+    setOpenTransactions(true);
+    getTransactions(_user.id);
+  }, [_user?.id]);
+
   return (
     <div className="group">
       <div className="group">
         <h3>Hello, {_user.name || _user.email}</h3>
         <div className="group">
-          <div className="field">
-            <h2>{_user.balance}</h2>
+          <div className="field" onClick={handleShowTransactions}>
+            <h2>{_user.balance || 0}</h2>
             <div>balance</div>
           </div>
           <div className="controls">
@@ -115,26 +131,31 @@ export default function User({ apiDomain, user }) {
         </a>
       </div>
 
-      <div className="section">
-        <label>History</label>
-
-        <div className="history">
-          {!_user.history?.length ? (
-            <div>no history records</div>
-          ) : (
-            _user.history.map((it, index) => {
-              return (
-                <div key={index} className="history_item">
-                  <Link href={`/sessions/${it.id}`}>
-                    {it.source || "custom"}
-                  </Link>
-                  <span>{it.status || "pending"}</span>
-                </div>
-              );
-            })
-          )}
+      {/* <div className="section">
+        <div onClick={() => setOpenHistory((state) => !state)} className="controls">
+          <label>History</label>
+          <span>{isOpenHistory ? "-" : "+"}</span>
         </div>
-      </div>
+
+        {isOpenHistory ? (
+          <div className="history">
+            {!_user.history?.length ? (
+              <div>no history records</div>
+            ) : (
+              _user.history.map((it, index) => {
+                return (
+                  <div key={index} className="history_item">
+                    <Link href={`/sessions/${it.id}`}>
+                      {it.source || "custom"}
+                    </Link>
+                    <span>{it.status || "pending"}</span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : null}
+      </div> */}
       <Popup
         visible={showTransaction}
         onClose={() => setShowTransaction(false)}
@@ -197,11 +218,43 @@ export default function User({ apiDomain, user }) {
           </Form>
         </div>
       </Popup>
+      <Popup
+        visible={isOpenTransactions}
+        onClose={() => setOpenTransactions(false)}
+      >
+        <div className="group">
+          <h2>Transactions</h2>
+          <div className="group">
+            {loadingTransactions ? (
+              <div>loading</div>
+            ) : transactions ? (
+              transactions.map((it, index) => {
+                return (
+                  <div key={it.id || index} className="flex gap-1 between border-1 p-1 transaction">
+                    <Link href={`/sessions/${it.sessionId}`}>
+                      Session #{it.sessionId}
+                    </Link>
+                    <span>{it.value}</span>
+                  </div>
+                );
+              })
+            ) : (
+              <div>no transactions</div>
+            )}
+          </div>
+        </div>
+      </Popup>
       <style jsx>{`
         .history,
         .group {
           display: flex;
           flex-direction: column;
+          gap: 1rem;
+        }
+
+        .transaction {
+          display: flex;
+          align-items: center;
           gap: 1rem;
         }
 

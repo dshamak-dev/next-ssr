@@ -14,3 +14,7 @@ export const getUserBalance = async (domain, id) => {
 export const setUserTransaction = async (domain, id, body) => {
   return post(domain, `users/${id}/transaction`, null, JSON.stringify(body));
 };
+
+export const getUserTransactions = async (domain, id) => {
+  return get(domain, `users/${id}/transactions`).then((res) => res.json()).catch((err) => []);
+}; 

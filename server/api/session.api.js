@@ -11,6 +11,7 @@ const {
   getUserSessionState,
   addSessionParticipant,
   SESSION_STATUS_TYPES,
+  lockSessionBids,
 } = require("../controls/session.controls.js");
 
 const emitter = new EventEmitter();
@@ -143,6 +144,10 @@ const init = (app) => {
         (_user) => Number(_user[SESSION_NAMINGS.bidValue]) === sessionBid
       );
 
+      if (allAccepted) {
+        lockSessionBids(session.id);
+      }
+
       updateFields[SESSION_NAMINGS.status] = allAccepted
         ? "active"
         : session[SESSION_NAMINGS.status];
@@ -195,18 +200,10 @@ const init = (app) => {
         break;
       }
       case "active": {
-        const sessionBid = Number(session[SESSION_NAMINGS.bidValue]) || 0;
-        const clients = getSessionClients(session);
-
-        updates.summary = sessionBid * clients.length;
-
-        clients.forEach(({ id }) => {
-          const client = clientsDB.find({ id });
-
-          if (client != null) {
-            clientsDB.patch({ id }, { balance: client.balance - sessionBid });
-          }
-        });
+        _updates = {
+          ...lockSessionBids(session.id),
+          status,
+        };
 
         _updated = sessionsDB.patch({ id: sessionId }, updates);
         break;

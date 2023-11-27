@@ -44,7 +44,7 @@ module.exports = {
       let session = findSession({ ownerId, connectionId });
 
       if (session == null) {
-        session = createSession(ownerId, { connectionId });
+        session = createSession(ownerId, { connectionId, source: ownerId });
       }
 
       res.status(200).json({ sessionId: session?.id });

@@ -517,10 +517,10 @@
     async sync() {
       const { userId, sessionId } = this;
 
-      if (this.abortController) {
-        this.abortController.abort();
-        this.abortController = null;
-      }
+      // if (this.abortController) {
+      //   this.abortController.abort();
+      //   this.abortController = null;
+      // }
 
       if (this.sessionId == null) {
         return;
