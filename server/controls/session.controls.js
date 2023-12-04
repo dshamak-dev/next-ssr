@@ -1,6 +1,9 @@
 const { clientsDB, sessionsDB } = require("../scripts/tables");
 const { reduceRecord, uid } = require("../scripts/support.js");
-const { getUsersPublicInfo, requestClientTransaction } = require("./user.controls.js");
+const {
+  getUsersPublicInfo,
+  requestClientTransaction,
+} = require("./user.controls.js");
 
 const SESSION_NAMINGS = {
   clients: "users",
@@ -154,18 +157,7 @@ const resolveSession = (sessionQuery, participants) => {
 
   updates.summary = summary;
 
-  const winners = participants
-    .map((p) => {
-      const user = session[SESSION_NAMINGS.clients].find(
-        (it) => it.playerId === p.playerId
-      );
-
-      return {
-        ...p,
-        id: user?.id,
-      };
-    })
-    .filter(({ id, state }) => id != null && state);
+  const winners = participants.filter(({ id, state }) => id != null && state);
   const amount = summary / winners.length;
 
   updates[SESSION_NAMINGS.status] = SESSION_STATUS_TYPES.resolved;
@@ -175,7 +167,7 @@ const resolveSession = (sessionQuery, participants) => {
   };
 
   winners.forEach(({ state, id, ...props }) => {
-    requestClientTransaction(id, {sessionId: session.id, value: amount})
+    requestClientTransaction(id, { sessionId: session.id, value: amount });
   });
 
   return sessionsDB.patch({ id: session.id }, updates);
@@ -271,8 +263,8 @@ const lockSessionBids = (sessionId) => {
   clients.forEach(({ id, bid }) => {
     requestClientTransaction(id, {
       sessionId: session.id,
-      value: Number(bid) * -1
-    })
+      value: Number(bid) * -1,
+    });
   });
 
   return sessionsDB.patch({ id: sessionId }, updates);

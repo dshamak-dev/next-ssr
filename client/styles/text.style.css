@@ -1,0 +1,20 @@
+/* Transformation */
+.capitalize {
+  text-transform: capitalize;
+}
+
+/* Align */
+.text-center {
+  text-align: center;
+}
+
+/* Size */
+.text-xl {
+  font-size: 2rem;
+}
+.text-lg {
+  font-size: 1.75rem;
+}
+.text-xs {
+  font-size: 0.8em;
+}

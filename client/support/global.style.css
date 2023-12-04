@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --white: #FFF;
+  --black: #0A0C19;
+  --red: #FCC5BC;
+  --green: #56A0A9;
+}
+
+html {
+  font-size: 20px;
+  font-family: monospace;
+  color: var(--black);
+  background-color: var(--white);
+}
+
+@import '../styles/text.style.css';
+@import '../styles/flex.style.css';
+
+img.invert {
+  filter: invert(1);
+}
+
+.rounded-full {
+  border-radius: 100%;
+}
+
+.error {
+  color: red;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.w-min {
+  width: min-content !important;
+}
+
+.w-fit {
+  width: fit-content !important;
+}
+
+.border-1 {
+  border: 1px solid currentColor;
+}
+
+.p-1 {
+  padding: 1em;
+}

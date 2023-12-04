@@ -1,0 +1,1 @@
+[{"id":"nov27m1117","players":["user_1","dmitrysh"],"status":"closed","state":{"user_1":{"number":10,"ready":true},"dmitrysh":{"number":9,"ready":true}},"createdAt":1701073201484,"updatedAt":1701073247016,"minValue":0,"maxValue":10,"results":{"user_1":true,"dmitrysh":false}}]

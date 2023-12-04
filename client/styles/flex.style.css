@@ -1,0 +1,35 @@
+.flex {
+  display: flex;
+
+  &.between {
+    justify-content: space-between;
+  }
+  &.items-center {
+    align-items: center;
+  }
+  &.justify-center {
+    justify-content: center;
+  }
+}
+.flex.col {
+  flex-direction: column;
+}
+.flex.wrap {
+  flex-wrap: wrap;
+}
+
+/* Gap */
+.gap-1 {
+  gap: 1em;
+}
+.gap-2 {
+  gap: 2em;
+}
+.gap-3 {
+  gap: 3em;
+}
+
+/* Grow */
+.grow-1 {
+  flex-grow: 1;
+}
