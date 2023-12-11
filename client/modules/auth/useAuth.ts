@@ -1,22 +1,31 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-type authType =  'google';
+import { signOut, useSession } from "next-auth/react";
+
+type authType = "google";
 
 export const useAuth = () => {
-  const [user, setUser] = useState(undefined);
-  const [loading, setLoading] = useState(false);
+  const { data , status} = useSession();
 
-  const signIn = useCallback((type: authType) => {
-    setUser({ fullName: 'John Doe', email: 'j.doe@gmail.com' });
-  }, []);
-  const signOut = useCallback(() => {
-    setUser(undefined);
-  }, []);
+  const user = useMemo(() => {
+    if (!data?.user) {
+      return null;
+    }
+
+    const user = Object.assign({
+      id: data.user.email,
+      displayName: data.user.email || data.user.name,
+    }, data.user);
+
+    return user;
+  }, [data?.user]);
+
+  const authId = useMemo(() => user?.id, [user?.id]);
 
   return {
-    loading,
     user,
-    signIn,
-    signOut
+    authId,
+    status,
+    signOut,
   };
 };

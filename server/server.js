@@ -1,16 +1,15 @@
 const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
-const os = require("os");
-const path = require("path");
-const fs = require('fs');
 
-const tables = require('./scripts/tables');
+// const tables = require('./scripts/tables');
 
-const { useUserApi } = require("./api/users.api");
-const { useSessionApi } = require("./api/session.api");
-const { useConnectionApi } = require("./api/connect.api.js");
-const { useGameApi } = require("./api/game.api.js");
+// const { useUserApi } = require("./api/users.api");
+// const { useSessionApi } = require("./api/session.api");
+// const { useConnectionApi } = require("./api/connect.api.js");
+// const { useGameApi } = require("./api/game.api.js");
+
+const profileRouter = require("./modules/profile/profile.router.js");
 
 require('dotenv').config({ path: '../.env' });
 
@@ -34,31 +33,29 @@ app.use(
 
 app.use(express.json());
 
-app.get("/health", (req, res) => {
-  res.status(200).send(true);
-});
+app.use('/api', profileRouter);
 
-useUserApi(app);
-useSessionApi(app);
-useConnectionApi(app);
-useGameApi(app);
+// app.get("/health", (req, res) => {
+//   res.status(200).send(true);
+// });
 
-app.get("/contest/client", (req, res) => {
-  const filePath =  path.join(__dirname, './client.script.js');
-  const file = fs.readFileSync(filePath).toString();
+// useUserApi(app);
+// useSessionApi(app);
+// useConnectionApi(app);
+// useGameApi(app);
 
-  const { company } = req.query;
+// app.get("/contest/client", (req, res) => {
+//   const filePath =  path.join(__dirname, './client.script.js');
+//   const file = fs.readFileSync(filePath).toString();
 
-  let updated = file.replace('__API_DOMAIN__', API_DOMAIN);
-  updated = updated.replace('__COMPANY_ID__', company);
+//   const { company } = req.query;
 
-  res.send(updated);
-});
+//   let updated = file.replace('__API_DOMAIN__', API_DOMAIN);
+//   updated = updated.replace('__COMPANY_ID__', company);
+
+//   res.send(updated);
+// });
 
 app.listen(PORT, () => {
-  const host = os.hostname();
-  const dir = os.homedir();
-  const platform = os.platform();
-
-  console.log({ host, dir, platform }, `Server listening on port: ${PORT}`);
+  console.log(`Server listening on port: ${PORT}`);
 });

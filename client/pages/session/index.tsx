@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import { NavigationView } from '../../modules/navigation/NavigationView';
+import { ProfileNavigation } from '../../modules/navigation/ProfileNavigation';
 
 export const SessionPage = () => {
   return (<main>
-    <NavigationView backUrl="/" />
+    <ProfileNavigation backUrl="/" />
   </main>);
 };
 

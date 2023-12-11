@@ -3,16 +3,16 @@ import { ButtonView as Button } from "../../modules/button/ButtonView";
 import { LinkView as Link } from "../../modules/link/LinkView";
 import styles from "./Signin.module.scss";
 import classNames from "classnames";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export const SignInPage = () => {
+  const router = useRouter();
   const { data: session } = useSession();
 
-  const handleContinue = useCallback(() => {}, []);
-
-  useEffect(() => {
-    console.log({session});
-  }, [session]);
+  const handleContinue = useCallback(() => {
+    router.push('/profile');
+  }, []);
 
   return (
     <main className={classNames(styles.page, "flex col gap-3 between")}>

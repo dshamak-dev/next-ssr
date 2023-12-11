@@ -14,15 +14,13 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 export default function PageDocument(props) {
-  const children = props.children as React.ReactNode;
-
   return (
     <Html lang="en">
       <Head>
         <link rel="icon" href="/favicon.png" sizes="any" />
       </Head>
       <body>
-        <Main>{children}</Main>
+        <Main />
         <NextScript />
       </body>
     </Html>

@@ -1,7 +1,9 @@
 .page {
+  position: relative;
   height: 100vh;
   height: 100dvh;
   width: 100vw;
+  max-width: 100%;
   padding: 8rem 2rem 1rem;
 
   color: var(--white);
@@ -30,15 +32,17 @@
   }
 
   & .content {
+    --size: 24rem;
+
     position: relative;
 
     &:after {
       content: "";
       position: absolute;
-      top: calc(50% - 60vw);
-      left: calc(50% - 60vw);
-      width: 120vw;
-      height: 120vw;
+      top: calc(50% - var(--size) / 2);
+      left: calc(50% - var(--size) / 2);
+      width: var(--size);
+      height: var(--size);
       border-radius: 100%;
       background-color: var(--green);
     }

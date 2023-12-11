@@ -23,11 +23,10 @@ export const IndexPage = () => {
         <Button onClick={handleCreateSession}>Create</Button>
         <Button primary>Join</Button>
       </div>
-      <div className="controls flex col gap-1">
+      <div className="profile-link">
         <Link
           href="/profile"
           className="flex items-center justify-center rounded-full"
-          style={{ width: "40vw", height: "40vw", margin: "0 auto", background: 'var(--black)' }}
         >
           Profile
         </Link>
@@ -52,16 +51,40 @@ export const IndexPage = () => {
           z-index: 1;
         }
 
+        .profile-link {
+          --size: 8rem;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          position: absolute;
+          bottom: 1rem;
+          left: calc(50% - var(--size) / 2);
+
+          width: var(--size);
+          height: var(--size);
+
+          border-radius: var(--size);
+
+          background: var(--black);
+
+          z-index: 1;
+        }
+
         .circle {
-          position: fixed;
+          --width: 24rem;
+          --height: 12rem;
+
+          position: absolute;
           bottom: 0;
-          left: -5vw;
+          left: calc(50% - var(--width) / 2);
           z-index: 0;
-          width: 110vw;
-          height: calc(30vh + 2rem);
-          height: calc(30dvh + 2rem);
+          width: var(--width);
+          height: var(--height);
+          height: var(--height);
           background-color: var(--red);
-          border-radius: 30vh 30vh 0 0;
+          border-radius: var(--height) var(--height) 0 0;
         }
       `}</style>
     </main>
