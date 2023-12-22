@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useReducer, useState } from "react";
-import { ButtonView } from "../button/ButtonView";
+import { Button } from "../button/Button";
 import { ProfileContext } from "./profileContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRepeat } from "@fortawesome/free-solid-svg-icons";
@@ -34,9 +34,9 @@ export const ProfileAssets: React.FC<{}> = ({}) => {
     <div className="flex col items-center">
       <h2>{loading ? "-" : profile?.assets || 0}</h2>
       <label>assets</label>
-      <ButtonView onClick={() => handleToggle()}>
+      <Button onClick={() => handleToggle()}>
         <FontAwesomeIcon icon={faRepeat} />
-      </ButtonView>
+      </Button>
       {visible ? (
         <div>
           <ProfileTransactionForm onClose={() => handleToggle(false)} />

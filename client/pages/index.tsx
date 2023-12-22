@@ -1,13 +1,16 @@
 import React, { useCallback } from "react";
-import { ButtonView as Button } from "../modules/button/ButtonView";
+import { Button as Button } from "../modules/button/Button";
 import { LinkView as Link } from "../modules/link/LinkView";
 import { useRouter } from "next/router";
+import { PopupButton } from "../modules/popup/PopupButton";
+import { Form } from "../modules/form/Form";
+import { getSession } from "../modules/session/session.api";
 
 export const IndexPage = () => {
   const { push } = useRouter();
 
   const handleCreateSession = useCallback(() => {
-    push('/session');
+    push("/session");
   }, []);
 
   return (
@@ -21,7 +24,33 @@ export const IndexPage = () => {
       </h1>
       <div className="controls flex col gap-1 grow-1">
         <Button onClick={handleCreateSession}>Create</Button>
-        <Button primary>Join</Button>
+        <PopupButton
+          buttonProps={{ primary: true }}
+          onText="cancel"
+          offText="join"
+        >
+          <Form
+            initialData={{}}
+            fields={[
+              {
+                id: "sessionId",
+                type: "text",
+                required: true,
+                label: "Session Id",
+              },
+            ]}
+            onSubmit={async (e, { sessionId }) => {
+              const session = await getSession(sessionId).catch((err) => null);
+
+              if (!session) {
+                alert("no such session");
+                return;
+              }
+
+              push(`/session/${sessionId}`);
+            }}
+          />
+        </PopupButton>
       </div>
       <div className="profile-link">
         <Link

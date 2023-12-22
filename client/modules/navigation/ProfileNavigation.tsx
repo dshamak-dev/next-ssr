@@ -3,7 +3,11 @@ import { LinkView } from "../link/LinkView";
 import { useAuth } from "../auth/useAuth";
 import { ProfileContext } from "../profile/profileContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeftLong, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeftLong,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
+import { Loader } from "../loader/Loader";
 
 export const ProfileNavigation = ({ backUrl }) => {
   const { user, signOut } = useAuth();
@@ -26,7 +30,11 @@ export const ProfileNavigation = ({ backUrl }) => {
         {displayName ? (
           <>
             <div className="flex items-center grow-1">
-              <LinkView href="/profile">{displayName}</LinkView>
+              {loading ? (
+                <Loader />
+              ) : (
+                <LinkView href="/profile">{displayName}</LinkView>
+              )}
             </div>
             <div onClick={() => signOut()}>
               <FontAwesomeIcon icon={faRightFromBracket} />

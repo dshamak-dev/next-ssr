@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "../input/Input";
-import { ButtonView } from "../button/ButtonView";
+import { Button } from "../button/Button";
+import { Select } from "../input/Select";
 
-interface FormField {
-  type: "string" | "number" | "date" | "boolean" | "password" | "email";
+export interface FormField {
+  type:
+    | "string"
+    | "number"
+    | "date"
+    | "boolean"
+    | "password"
+    | "email"
+    | "select"
+    | "list";
   id: string;
   label?: string;
+  placeholder?: string;
+  options?: { text: string; value: any }[];
   valide?: (value: any) => boolean;
   required?: boolean;
 }
@@ -39,7 +50,21 @@ export const useForm = ({
 
       const _formData = new FormData(e.target);
       const _formFields = fields.reduce((prev, it) => {
-        return Object.assign(prev, { [it.id]: _formData.get(it.id) });
+        const value = _formData.get(it.id) || "";
+        let fieldValue: any = value;
+
+        switch (it.type) {
+          case "number": {
+            fieldValue = Number(value);
+            break;
+          }
+          case "list": {
+            fieldValue = (value as string).trim().split(" ");
+            break;
+          }
+        }
+
+        return Object.assign(prev, { [it.id]: fieldValue });
       }, {});
 
       if (onSubmit) {
@@ -49,24 +74,46 @@ export const useForm = ({
     [onSubmit]
   );
 
+  const renderInput = (field) => {
+    switch (field.type) {
+      case "select": {
+        const { id, options, label, ...props } = field;
+        return (
+          <Select
+            options={options}
+            label={label}
+            placeholder={`Ender ${label || id}`}
+            {...props}
+            key={id}
+            id={id}
+            name={id}
+            onChange={(e) => handleFieldChange(id, e.target.value)}
+          />
+        );
+      }
+      default: {
+        return (
+          <Input
+            placeholder={`Ender ${field.label || field.id}`}
+            {...field}
+            key={field.id}
+            label={field.label}
+            id={field.id}
+            name={field.id}
+            type={field.type}
+            defaultValue={formData ? formData[field.id] || "" : ""}
+            onChange={(e) => handleFieldChange(field.id, e.target.value)}
+          />
+        );
+      }
+    }
+  };
+
   const element = useMemo(() => {
     return (
       <form onSubmit={handleSubmit}>
-        {fields.map((field) => {
-          return (
-            <Input
-              {...field}
-              key={field.id}
-              label={field.label}
-              id={field.id}
-              name={field.id}
-              type={field.type}
-              defaultValue={formData ? formData[field.id] || "" : ""}
-              onChange={(e) => handleFieldChange(field.id, e.target.value)}
-            />
-          );
-        })}
-        <ButtonView secondary>Submit</ButtonView>
+        {fields.map(renderInput)}
+        <Button secondary>Submit</Button>
       </form>
     );
   }, [fields]);

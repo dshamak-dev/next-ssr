@@ -4,7 +4,7 @@ import styles from "./Button.module.scss";
 
 interface Props extends React.PropsWithChildren<any> {}
 
-export const ButtonView: React.FC<Props> = ({
+export const Button: React.FC<Props> = ({
   className,
   primary,
   secondary,

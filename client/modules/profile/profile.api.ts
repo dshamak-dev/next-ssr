@@ -1,15 +1,17 @@
-import { appApi, waitFor } from '../../api/api.model';
+import { appApi, waitFor } from "../../api/api.model";
 
 export const getProfile = async (id) => {
-  await waitFor(1000);
-
-  return appApi.get(`/profile?authId=${id}`);
+  return appApi.get(`/users?authId=${id}`);
 };
 
 export const postProfile = (body) => {
-  return appApi.post('profile', { json: true, body });
+  return appApi.post("users", { json: true, body });
 };
 
 export const postTransaction = (profileId, body) => {
-  return appApi.post(`profile/${profileId}/transaction`, { json: true, body });
+  return appApi.post(`users/${profileId}/transaction`, { json: true, body });
+};
+
+export const getProfileHistory = (profileId) => {
+  return appApi.get(`users/${profileId}/history`);
 };

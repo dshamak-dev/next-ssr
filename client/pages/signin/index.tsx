@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ButtonView as Button } from "../../modules/button/ButtonView";
+import { Button as Button } from "../../modules/button/Button";
 import { LinkView as Link } from "../../modules/link/LinkView";
 import styles from "./Signin.module.scss";
 import classNames from "classnames";
@@ -34,27 +34,18 @@ export const SignInPage = () => {
             <div className="flex col items-center">
               <label>Sign in with</label>
               <div className="social-list flex gap-1 justify-center items-center">
-                {/* <Link
+              <Link
                   href="/signin"
-                  aria-label="google"
+                  aria-label="github"
                   className={styles.social_link}
-                  onClick={() => signIn('google')}
-                >
-                  g
-                </Link> */}
+                  onClick={() => signIn('google', { redirect: true })}
+                ><img src="/google-icon.png" alt="google" className="invert" /></Link>
                 <Link
                   href="/signin"
                   aria-label="github"
                   className={styles.social_link}
                   onClick={() => signIn('github', { redirect: true })}
                 ><img src="/github-icon.png" alt="github" className="invert" /></Link>
-                {/* <Link
-                  href="/signin"
-                  aria-label="instagram"
-                  className={styles.social_link}
-                >
-                  i
-                </Link> */}
               </div>
             </div>
           </div>

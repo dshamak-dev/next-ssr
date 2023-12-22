@@ -17,9 +17,11 @@ export const ProfileTransactionsPage: React.FC<Props> = ({}) => {
       <div className="flex w-full col gap-1">
         {transactions.length
           ? transactions.map((it) => {
+            const label = it.type ? it.type : it.source;
+
               return (
                 <div key={it.id} className="flex items-center between w-full">
-                  <span>{it.type}</span>
+                  <span>{label || 'anonym'}</span>
                   <span>{it.value}</span>
                 </div>
               );

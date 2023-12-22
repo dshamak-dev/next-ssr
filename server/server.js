@@ -2,14 +2,8 @@ const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
 
-// const tables = require('./scripts/tables');
-
-// const { useUserApi } = require("./api/users.api");
-// const { useSessionApi } = require("./api/session.api");
-// const { useConnectionApi } = require("./api/connect.api.js");
-// const { useGameApi } = require("./api/game.api.js");
-
-const profileRouter = require("./modules/profile/profile.router.js");
+const userRouter = require("./modules/user/user.router.js");
+const sessionRouter = require("./modules/session/session.router.js");
 
 require('dotenv').config({ path: '../.env' });
 
@@ -33,28 +27,8 @@ app.use(
 
 app.use(express.json());
 
-app.use('/api', profileRouter);
-
-// app.get("/health", (req, res) => {
-//   res.status(200).send(true);
-// });
-
-// useUserApi(app);
-// useSessionApi(app);
-// useConnectionApi(app);
-// useGameApi(app);
-
-// app.get("/contest/client", (req, res) => {
-//   const filePath =  path.join(__dirname, './client.script.js');
-//   const file = fs.readFileSync(filePath).toString();
-
-//   const { company } = req.query;
-
-//   let updated = file.replace('__API_DOMAIN__', API_DOMAIN);
-//   updated = updated.replace('__COMPANY_ID__', company);
-
-//   res.send(updated);
-// });
+app.use('/api', userRouter);
+app.use('/api', sessionRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);

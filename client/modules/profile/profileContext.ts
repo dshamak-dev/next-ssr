@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, createElement } from "react";
 import { useProfile } from "./useProfile";
 
-export const ProfileContext = createContext<any>([false, null]);
+export const ProfileContext = createContext<any>([false, null, undefined]);
 
 export const ProfileProvider = ({ children }) => {
   const state = useProfile();

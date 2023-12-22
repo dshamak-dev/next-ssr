@@ -33,6 +33,22 @@ const update = async (id, data) => {
   return record;
 };
 
+const postHistory = async (id, sessionId) => {
+  let record = await get({ id });
+
+  if (record == null) {
+    return null;
+  }
+
+  const nextHistory = record.history || [];
+
+  if (!nextHistory.includes(sessionId)) {
+    nextHistory.push(sessionId);
+  }
+
+  return await update(id, { history: nextHistory });
+} 
+
 const remove = async () => {};
 
 module.exports = {
@@ -40,4 +56,5 @@ module.exports = {
   post,
   update,
   remove,
+  postHistory,
 };

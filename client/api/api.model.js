@@ -66,7 +66,7 @@ class Api {
     });
   }
 
-  post(path, { json = true, body }) {
+  post(path, { json = true, body, ...other }) {
     let requestBody = body;
 
     if (json && typeof body === "object") {
@@ -80,9 +80,14 @@ class Api {
         Accept: json ? "application/json" : undefined,
       },
       body: requestBody,
+      ...other,
     }).catch((err) => {
       return null;
     });
+  }
+
+  put(path, { json = true, body }) {
+    return this.post(path, { json, body, method: "put" });
   }
 }
 
