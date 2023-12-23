@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { useAuth } from "../auth/useAuth";
 import { getProfile } from "./profile.api";
 
@@ -35,13 +35,12 @@ export const useProfile = () => {
     loading: false,
   });
 
-  useEffect(() => {
+  const sync = useCallback(() => {
     if (!authId) {
       return;
     }
 
     dispatch({ type: "loading", value: true });
-
     getProfile(authId)
       .then((res) => res?.json())
       .then((data) => {
@@ -52,5 +51,13 @@ export const useProfile = () => {
       });
   }, [authId]);
 
-  return [loading, data, status == 'authenticated', dispatch];
+  useEffect(() => {
+    if (!authId) {
+      return;
+    }
+
+    sync();
+  }, [authId]);
+
+  return [loading, data, status == "authenticated", dispatch, sync];
 };

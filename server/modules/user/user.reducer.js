@@ -33,8 +33,6 @@ const blockuserAssets = async (user, payload) => {
 };
 
 const applyUserTransaction = async (user, payload) => {
-  console.log("transaction", payload);
-
   const transactions = user.transactions || [];
   let assets = Number(user.assets) || 0;
 

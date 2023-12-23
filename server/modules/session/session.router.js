@@ -3,6 +3,7 @@ const { get, post, getSessionUserState } = require("./session.controller");
 const { postHistory } = require("../user/user.controller");
 const { reducer } = require("./session.reducer.js");
 const { SessionStageType } = require("./session.model.js");
+const { addListener, removeListener } = require("./session.event.js");
 
 const router = express.Router();
 
@@ -18,12 +19,31 @@ router.get("/sessions/:id", async (req, res) => {
   res.status(200).json(record);
 });
 
+router.get("/sessions/:sessionId/:userId/subscribe", async (req, res) => {
+  const { sessionId, userId } = req.params;
+
+  if (!sessionId || !userId) {
+    return res.status(400).json({ error: "invalid data" });
+  }
+
+  addListener(userId, sessionId, () => {
+    removeListener(userId);
+
+    res.status(200).json({ error: null, ok: true });
+  });
+});
+
 router.post("/sessions", async (req, res) => {
   const body = req.body;
 
-  const record = await post(Object.assign({
-    stage: SessionStageType.Draft
-  }, body));
+  const record = await post(
+    Object.assign(
+      {
+        stage: SessionStageType.Draft,
+      },
+      body
+    )
+  );
 
   if (record == null) {
     return res.status(400).json(null);

@@ -9,11 +9,7 @@ config.autoAddCss = false;
 dom.watch();
 
 import "../support/global.style.css";
-import { useProfile } from "../modules/profile/useProfile";
-import {
-  ProfileContext,
-  ProfileProvider,
-} from "../modules/profile/profileContext";
+import { ProfileProvider } from "../modules/profile/profileContext";
 
 export default function MyApp({
   Component,

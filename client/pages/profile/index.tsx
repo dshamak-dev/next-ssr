@@ -11,7 +11,6 @@ import styles from "./Profile.module.scss";
 import { ProfileInfoPage } from "./ProfileInfo";
 import { ProfileTransactionsPage } from "./ProfileTransactions";
 import { ProfileHistoryPage } from "./ProfileHistory";
-import { useProfile } from "../../modules/profile/useProfile";
 import { ProfileContext } from "../../modules/profile/profileContext";
 import { Loader } from "../../modules/loader/Loader";
 import { ProfileFormPage } from "./ProfileForm";
@@ -44,7 +43,7 @@ const tabs: { id: tabType; label: string; icon: IconDefinition }[] = [
 ];
 
 export const ProfilePage = () => {
-  const [loading, profile, signedIn] = useContext(ProfileContext);
+  const [loading, profile, signedIn, dispatch, syncProfile] = useContext(ProfileContext);
   const [selected, setSelected] = useState<tabType | null>(null);
 
   const handleTabClick = useCallback((tab) => {
@@ -58,6 +57,10 @@ export const ProfilePage = () => {
 
     setSelected(profile == null ? "form" : tabs[0].id);
   }, [loading, profile, signedIn]);
+
+  useEffect(() => {
+    syncProfile();
+  }, []);
 
   const content = useMemo(() => {
     switch (selected) {

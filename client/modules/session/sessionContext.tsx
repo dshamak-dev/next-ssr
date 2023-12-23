@@ -1,6 +1,6 @@
 import { useApi } from "../../support/useApi";
-import { getSessionState } from "./session.api";
-import { createContext, useCallback, useContext } from "react";
+import { getSessionState, subscribeSessionUpdate } from "./session.api";
+import { createContext, useCallback, useContext, useEffect } from "react";
 import { SessionState } from "./session.model";
 import { ProfileContext } from "../profile/profileContext";
 
@@ -17,12 +17,25 @@ export const ContestSessionProvider = ({ id, children }) => {
     null,
     profile?.id != null
   );
+  const [pending, subscribeState, subscribeError, subscribe] = useApi(
+    () => subscribeSessionUpdate(id, profile?.id),
+    null,
+    profile?.id != null
+  );
 
   const dispatch = useCallback((nextData) => {
     if (forseData) {
       forseData(nextData);
     }
   }, []);
+
+  useEffect(() => {
+    if (subscribeState?.ok) {
+      request();
+
+      subscribe();
+    }
+  }, [subscribeState]);
 
   return (
     <ContestSessionContext.Provider

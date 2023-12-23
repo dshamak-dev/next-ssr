@@ -1,3 +1,3 @@
 export { default } from "next-auth/middleware";
 
-export const config = { matcher: ["/profile", "/session"] };
+export const config = { matcher: ["/profile", "/session", "/session/:id*"] };

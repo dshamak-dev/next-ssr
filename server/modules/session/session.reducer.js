@@ -1,9 +1,11 @@
 const { uid } = require("../../scripts/support.js");
+const { postHistory } = require("../user/user.controller.js");
 const {
   reducer: userReducer,
   UserActionTypes,
 } = require("../user/user.reducer.js");
 const { get, update } = require("./session.controller.js");
+const { emit } = require("./session.event.js");
 const { SessionStageType } = require("./session.model.js");
 const {
   getSessionSummary,
@@ -36,6 +38,8 @@ const sessionActions = {
     }
 
     data.users[userId] = { optionId: null, value: null };
+
+    await postHistory(userId, session.id);
 
     return [error, data];
   },
@@ -214,6 +218,8 @@ module.exports = {
     if (!error && nextState) {
       await update(nextState.id, nextState);
     }
+
+    emit(sessionId, nextState, [userId]);
 
     return [error, nextState];
   },

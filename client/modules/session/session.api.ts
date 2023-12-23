@@ -81,3 +81,12 @@ export const resolveSession = (sessionId: string, userId, payload) => {
     .put(`/sessions/${sessionId}/action`, { json: true, body })
     .then((res) => res?.json());
 };
+
+export const subscribeSessionUpdate = async (sessionId, userId) => {
+  return appApi
+    .get(`/sessions/${sessionId}/${userId}/subscribe`)
+    .then((res) => res?.json())
+    .catch((error) => {
+      return { updateAt: Date.now(), ok: false };
+    });
+};
