@@ -1,0 +1,30 @@
+/* Cursor */
+.pointer {
+  cursor: pointer;
+}
+
+/* Selection */
+.select-none {
+  user-select: none;
+}
+
+/* Opacity */
+.opacity-50 {
+  opacity: 0.5;
+}
+
+/* Filter */
+.grayscale {
+  filter: grayscale(1);
+}
+
+/* Background */
+.bg-white {
+  background-color: var(--white);
+}
+.bg-black {
+  background-color: var(--black);
+}
+.bg-red {
+  background-color: var(--red);
+}

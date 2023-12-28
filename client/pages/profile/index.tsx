@@ -1,4 +1,5 @@
 import React, {
+  ReactElement,
   useCallback,
   useContext,
   useEffect,
@@ -21,6 +22,7 @@ import {
   faRepeat,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { ProfileAssets } from "../../modules/profile/ProfileAssets";
 
 type tabType = "form" | "general" | "transaction" | "history";
 
@@ -43,7 +45,8 @@ const tabs: { id: tabType; label: string; icon: IconDefinition }[] = [
 ];
 
 export const ProfilePage = () => {
-  const [loading, profile, signedIn, dispatch, syncProfile] = useContext(ProfileContext);
+  const [loading, profile, signedIn, dispatch, syncProfile] =
+    useContext(ProfileContext);
   const [selected, setSelected] = useState<tabType | null>(null);
 
   const handleTabClick = useCallback((tab) => {
@@ -63,29 +66,45 @@ export const ProfilePage = () => {
   }, []);
 
   const content = useMemo(() => {
+    let renderer = (): ReactElement | null => null;
+    let addAssetsController = false;
+
     switch (selected) {
       case "form": {
-        return <ProfileFormPage />;
+        renderer = () => <ProfileFormPage />;
+        break;
       }
       case "general": {
-        return <ProfileInfoPage />;
+        addAssetsController = true;
+        renderer = () => <ProfileInfoPage />;
+        break;
       }
       case "transaction": {
-        return <ProfileTransactionsPage />;
+        addAssetsController = true;
+        renderer = () => <ProfileTransactionsPage />;
+        break;
       }
       case "history": {
-        return <ProfileHistoryPage />;
-      }
-      default: {
-        return null;
+        addAssetsController = true;
+        renderer = () => <ProfileHistoryPage />;
+        break;
       }
     }
+
+    if (addAssetsController) {
+      return <>
+        <ProfileAssets />
+        <div className={styles.contentScroll}>{renderer()}</div>
+      </>;
+    }
+
+    return renderer();
   }, [selected]);
 
   return (
     <main className={styles.page}>
       <ProfileNavigation backUrl="/" />
-      <div>{loading ? <Loader /> : content}</div>
+      <div className={styles.content}>{loading ? <Loader /> : content}</div>
       {profile ? (
         <div className={styles.tabs}>
           {tabs.map((tab) => {

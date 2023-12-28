@@ -1,4 +1,5 @@
 const { uid } = require("../../scripts/support.js");
+const { Transaction } = require("../transaction/transaction.model.js");
 const { get, update } = require("./user.controller.js");
 
 const UserActionTypes = {
@@ -6,6 +7,7 @@ const UserActionTypes = {
   ApplyTransaction: 2,
   AddHistoryRecord: 3,
   ResolveBlockedAssets: 4,
+  ApplyVoucher: 5,
 };
 
 const blockuserAssets = async (user, payload) => {
@@ -36,17 +38,11 @@ const applyUserTransaction = async (user, payload) => {
   const transactions = user.transactions || [];
   let assets = Number(user.assets) || 0;
 
-  assets += Number(payload.value);
+  const transaction = new Transaction(payload);
 
-  transactions.push(
-    Object.assign(
-      {
-        id: uid(),
-        createdAt: Date.now(),
-      },
-      payload
-    )
-  );
+  assets = transaction.apply(assets);
+
+  transactions.push(transaction);
 
   return [
     null,
@@ -57,9 +53,32 @@ const applyUserTransaction = async (user, payload) => {
   ];
 };
 
+const applyUserVoucher = async (user, voucher) => {
+  if (!voucher || !voucher.id) {
+    return user;
+  }
+
+  const transactions = user.transactions || [];
+
+  if (transactions.find((it) => it.sourceId === voucher.id)) {
+    return ["voucher was already used", user];
+  }
+
+  const transaction = {
+    title: voucher.tag,
+    sourceId: voucher.id,
+    sourceType: "voucher",
+    type: "add",
+    value: voucher.value,
+  };
+
+  return applyUserTransaction(user, transaction);
+};
+
 const userActions = {
   [UserActionTypes.BlockAssets]: blockuserAssets,
   [UserActionTypes.ApplyTransaction]: applyUserTransaction,
+  [UserActionTypes.ApplyVoucher]: applyUserVoucher,
   [UserActionTypes.ResolveBlockedAssets]: async (user, payload) => {
     const { sourceId, revert = false } = payload;
 
@@ -102,7 +121,7 @@ const userActions = {
   },
 };
 
-const reducer = async (userId, actionType, payload, saveChanges = false) => {
+const reducer = async (userId, actionType, payload, saveChanges = true) => {
   const user = await get({ id: userId });
 
   if (!user) {

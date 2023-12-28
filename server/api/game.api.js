@@ -51,8 +51,6 @@ module.exports = {
 
         res.json(data);
       } catch (err) {
-        console.log(err);
-
         res.json({ error: err.message });
       }
     });

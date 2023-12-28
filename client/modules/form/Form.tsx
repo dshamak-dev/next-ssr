@@ -1,9 +1,9 @@
 import React from "react";
-import { useForm } from "./useForm";
+import { FormField, useForm } from "./useForm";
 
 interface Props extends React.PropsWithChildren<any> {
   initialData;
-  fields;
+  fields: FormField[];
   onSubmit: (e, data) => void;
 }
 

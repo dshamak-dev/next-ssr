@@ -33,8 +33,7 @@ export const postSessionBid = (
   };
 
   return appApi
-    .put(`/sessions/${sessionId}/action`, { json: true, body })
-    .then((res) => res?.json());
+    .put(`/sessions/${sessionId}/action`, { json: true, body });
 };
 
 export const removeSessionBid = (sessionId: string, userId) => {
@@ -44,8 +43,7 @@ export const removeSessionBid = (sessionId: string, userId) => {
   };
 
   return appApi
-    .put(`/sessions/${sessionId}/action`, { json: true, body })
-    .then((res) => res?.json());
+    .put(`/sessions/${sessionId}/action`, { json: true, body });
 };
 
 export const joinSessionBid = (sessionId: string, userId) => {
@@ -55,8 +53,7 @@ export const joinSessionBid = (sessionId: string, userId) => {
   };
 
   return appApi
-    .put(`/sessions/${sessionId}/action`, { json: true, body })
-    .then((res) => res?.json());
+    .put(`/sessions/${sessionId}/action`, { json: true, body });
 };
 
 export const lockSession = (sessionId: string, userId) => {
@@ -66,8 +63,7 @@ export const lockSession = (sessionId: string, userId) => {
   };
 
   return appApi
-    .put(`/sessions/${sessionId}/action`, { json: true, body })
-    .then((res) => res?.json());
+    .put(`/sessions/${sessionId}/action`, { json: true, body });
 };
 
 export const resolveSession = (sessionId: string, userId, payload) => {
@@ -78,8 +74,7 @@ export const resolveSession = (sessionId: string, userId, payload) => {
   };
 
   return appApi
-    .put(`/sessions/${sessionId}/action`, { json: true, body })
-    .then((res) => res?.json());
+    .put(`/sessions/${sessionId}/action`, { json: true, body });
 };
 
 export const subscribeSessionUpdate = async (sessionId, userId) => {

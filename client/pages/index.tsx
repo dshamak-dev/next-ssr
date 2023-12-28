@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { PopupButton } from "../modules/popup/PopupButton";
 import { Form } from "../modules/form/Form";
 import { getSession } from "../modules/session/session.api";
+import { FormField } from "../modules/form/useForm";
 
 export const IndexPage = () => {
   const { push } = useRouter();
@@ -38,7 +39,7 @@ export const IndexPage = () => {
                 required: true,
                 label: "Session Id",
               },
-            ]}
+            ] as any[]}
             onSubmit={async (e, { sessionId }) => {
               const session = await getSession(sessionId).catch((err) => null);
 

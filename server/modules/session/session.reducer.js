@@ -173,18 +173,18 @@ const sessionActions = {
       Object.entries(usersPrize).map(async ([id, it]) => {
         const { rate, value } = it;
 
-        const transition = {
-          id: uid(),
+        const transiaction = {
           value,
-          source: data.name,
+          title: data.name,
           sourceId: data.id,
           sourceType: "session",
+          type: 'add'
         };
 
         return userReducer(
           id,
           UserActionTypes.ApplyTransaction,
-          transition,
+          transiaction,
           true
         ).then((res) => {
           Object.assign(data.users[id], {

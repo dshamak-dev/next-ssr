@@ -8,8 +8,9 @@ config.autoAddCss = false;
 
 dom.watch();
 
-import "../support/global.style.css";
+import "../styles/global.style.css";
 import { ProfileProvider } from "../modules/profile/profileContext";
+import { NotificationProvider } from "../modules/notification/NotificationContext";
 
 export default function MyApp({
   Component,
@@ -19,6 +20,7 @@ export default function MyApp({
     <SessionProvider session={session}>
       <ErrorBoundary>
         <ProfileProvider>
+          <NotificationProvider />
           <Component {...pageProps} />
         </ProfileProvider>
       </ErrorBoundary>

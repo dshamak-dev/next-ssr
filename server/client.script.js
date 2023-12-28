@@ -291,8 +291,6 @@
 
       this.clear();
 
-      console.log(state);
-
       if (state == null) {
         return;
       }
@@ -300,8 +298,6 @@
       const userStatus = state.userState?.status || USER_STATUS_TYPES.draft;
 
       const handleSubmitBid = async (data, callback) => {
-        console.log("bid form data", data);
-
         const user = await get(
           `users/search?email=${data.email}&password=${data.password}`
         )

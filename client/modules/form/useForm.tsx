@@ -4,13 +4,14 @@ import { Button } from "../button/Button";
 import { Select } from "../input/Select";
 
 export interface FormField {
-  type:
+  type?:
     | "string"
     | "number"
     | "date"
     | "boolean"
     | "password"
     | "email"
+    | "date"
     | "select"
     | "list";
   id: string;
@@ -50,10 +51,11 @@ export const useForm = ({
 
       const _formData = new FormData(e.target);
       const _formFields = fields.reduce((prev, it) => {
+        const type = it.type || 'text';
         const value = _formData.get(it.id) || "";
         let fieldValue: any = value;
 
-        switch (it.type) {
+        switch (type) {
           case "number": {
             fieldValue = Number(value);
             break;

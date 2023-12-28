@@ -42,9 +42,7 @@ export const SessionFormPage = () => {
         fields
       );
 
-      const session = await postSession(data)
-        .then((res) => res?.json())
-        .catch(() => null);
+      const session = await postSession(data).catch(() => null);
 
       if (session) {
         router.replace(`/session/${session.id}`);

@@ -13,7 +13,7 @@ export const Button: React.FC<Props> = ({
   return (
     <button
       {...other}
-      className={classNames(styles.button, className, { [styles.primary]: primary, [styles.secondary]: secondary })}
+      className={classNames(styles.button, 'pointer select-none', className, { [styles.primary]: primary, [styles.secondary]: secondary })}
     ></button>
   );
 };

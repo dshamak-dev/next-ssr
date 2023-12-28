@@ -33,7 +33,6 @@ module.exports = {
             },
             (response) => {
               response.on("data", (data) => {
-                console.log({ data });
                 resolve(data);
               });
 
@@ -49,8 +48,6 @@ module.exports = {
       });
 
       return promise.catch((err) => {
-        console.log('Response Error', err);
-
         return { ok: false, error: err };
       }).finally(() => {
         clearMemo();

@@ -2,6 +2,7 @@ const express = require("express");
 const { get, post, update, postHistory } = require("./user.controller");
 const { get: getSession } = require("../session/session.controller");
 const { reducer, UserActionTypes } = require("./user.reducer.js");
+const { reducer: voucherReducer, VoucherActionType } = require("../voucher/voucher.reducer.js");
 
 const router = express.Router();
 
@@ -64,6 +65,31 @@ router.post("/users/:id/transaction", async (req, res) => {
     id,
     UserActionTypes.ApplyTransaction,
     body
+  );
+
+  if (error) {
+    return res.status(400).json({ error: error });
+  }
+
+  const record = await update(id, Object.assign({}, user));
+
+  res.status(200).json(record);
+});
+
+router.post("/users/:id/voucher", async (req, res) => {
+  const { id } = req.params;
+
+  const [voucherError, voucher] = await voucherReducer(VoucherActionType.Use, { tag: req.body?.voucher }, true);
+
+  if (voucherError) {
+    return res.status(400).json({ error: voucherError });
+  }
+
+  const [error, user] = await reducer(
+    id,
+    UserActionTypes.ApplyVoucher,
+    voucher,
+    true
   );
 
   if (error) {

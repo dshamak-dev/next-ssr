@@ -81,9 +81,25 @@ class Api {
       },
       body: requestBody,
       ...other,
-    }).catch((err) => {
-      return null;
-    });
+    })
+      .then(async (res) => {
+        let error = null;
+        let response = null;
+
+        try {
+          if (res.json) {
+            response = await res.json();
+
+            error = response?.error;
+          }
+        } catch (err) {}
+
+        if (!error && res.status >= 200 && res.status < 300) {
+          return response;
+        }
+
+        return Promise.reject({ message: error });
+      });
   }
 
   put(path, { json = true, body }) {

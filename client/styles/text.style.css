@@ -18,3 +18,14 @@
 .text-xs {
   font-size: 0.8em;
 }
+
+/* Color */
+.text-white {
+  color: var(--white);
+}
+.text-black {
+  color: var(--black);
+}
+.text-red {
+  color: var(--red);
+}

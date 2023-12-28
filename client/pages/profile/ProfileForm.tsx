@@ -27,7 +27,7 @@ export const ProfileFormPage: React.FC<Props> = ({}) => {
 
     dispatch({ type: "loading", value: true });
 
-    const response = await postProfile(profile).then(res => res?.json());
+    const response = await postProfile(profile);
 
     dispatch({ type: "data", value: response });
   }, [authId, dispatch]);
