@@ -1,11 +1,8 @@
 import { useContext, useMemo } from "react";
 import { ContestSessionContext } from "./sessionContext";
 import { ProfileContext } from "../profile/profileContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "../button/Button";
 import { removeSessionBid } from "./session.api";
-import { SessionUsers } from "./SessionUsers";
 
 export const SessionBidInfo = () => {
   const [_, profile] = useContext(ProfileContext);
@@ -44,7 +41,6 @@ export const SessionBidInfo = () => {
         <span>You set</span> <h2>{selection.value}</h2> <span>on</span>{" "}
         <strong>"{selection.text}"</strong>
       </p>
-      <SessionUsers />
 
       <p className="text-center opacity-50">waiting for start</p>
 

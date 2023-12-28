@@ -8,10 +8,16 @@ export const SessionUsers: React.FC = () => {
 
   const { users } = data;
 
+  const total = useMemo(() => users?.length || 0, [users?.length]);
+
   const readyNum = useMemo(
     () => users.filter(({ ready }) => ready).length,
     [users]
   );
+
+  if (!total) {
+    return null;
+  }
 
   return (
     <div className="flex gap-1 justify-center">
@@ -21,7 +27,7 @@ export const SessionUsers: React.FC = () => {
       </span>
       <span>/</span>
       <span className="flex gap-1">
-        {users.length}
+        {total}
         <FontAwesomeIcon icon={faPerson} />
       </span>
     </div>

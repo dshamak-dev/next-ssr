@@ -55,7 +55,7 @@ const applyUserTransaction = async (user, payload) => {
 
 const applyUserVoucher = async (user, voucher) => {
   if (!voucher || !voucher.id) {
-    return user;
+    return ['invalid voucher', user];
   }
 
   const transactions = user.transactions || [];

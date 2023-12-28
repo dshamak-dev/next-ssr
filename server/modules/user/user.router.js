@@ -81,8 +81,8 @@ router.post("/users/:id/voucher", async (req, res) => {
 
   const [voucherError, voucher] = await voucherReducer(VoucherActionType.Use, { tag: req.body?.voucher }, true);
 
-  if (voucherError) {
-    return res.status(400).json({ error: voucherError });
+  if (voucherError || !voucher) {
+    return res.status(400).json({ error: voucherError || 'Voucher not found' });
   }
 
   const [error, user] = await reducer(

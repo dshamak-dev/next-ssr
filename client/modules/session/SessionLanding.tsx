@@ -3,7 +3,6 @@ import { ContestSessionContext } from "./sessionContext";
 import { ProfileContext } from "../profile/profileContext";
 import { Button } from "../button/Button";
 import { joinSessionBid } from "./session.api";
-import { SessionUsers } from "./SessionUsers";
 
 export const SessionLanding = () => {
   const [_, profile] = useContext(ProfileContext);
@@ -23,7 +22,6 @@ export const SessionLanding = () => {
 
   return (
     <div className="flex col gap-1">
-      <SessionUsers />
       <div>
         <Button secondary onClick={handleJoin}>
           Join Session

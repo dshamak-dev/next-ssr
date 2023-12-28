@@ -17,7 +17,7 @@ export default function AdminPage() {
     }
 
     return (
-      <div className="flex col gap-2">
+      <div className="flex col gap-2 text-xs">
         <h1>Admin Page</h1>
         <VoucherAdminSection />
       </div>

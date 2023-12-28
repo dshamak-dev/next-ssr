@@ -7,9 +7,9 @@ import { postSession } from "../../modules/session/session.api";
 
 const sessionFields: FormField[] = [
   {
-    id: "name",
-    label: "Room Name",
-    placeholder: "Enter Room Name",
+    id: "title",
+    label: "Room Title",
+    placeholder: "Enter Room Title",
     type: "string",
     required: true,
   },

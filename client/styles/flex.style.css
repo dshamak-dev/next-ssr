@@ -1,19 +1,18 @@
 .flex {
   display: flex;
+}
+.flex.between {
+  justify-content: space-between;
+}
+.flex.items-center {
+  align-items: center;
+}
+.flex.justify-center {
+  justify-content: center;
+}
 
-  &.between {
-    justify-content: space-between;
-  }
-  &.items-center {
-    align-items: center;
-  }
-  &.justify-center {
-    justify-content: center;
-  }
-
-  &.align-bottom {
-    align-items: end;
-  }
+.flex.align-bottom {
+  align-items: end;
 }
 .flex.col {
   flex-direction: column;

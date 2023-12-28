@@ -52,6 +52,7 @@ const getSessionUserState = async (session, userId) => {
 
   const {
     id,
+    title,
     ownerId,
     stage,
     description,
@@ -123,6 +124,7 @@ const getSessionUserState = async (session, userId) => {
 
   const state = {
     id,
+    title,
     admin: ownerId === userId,
     description,
     options,
