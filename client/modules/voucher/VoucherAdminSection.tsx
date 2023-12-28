@@ -42,7 +42,7 @@ export const VoucherAdminSection: React.FC<Props> = ({}) => {
     } else {
       show({ text: `Can't create voucher. Try again!` });
     }
-  }, []);
+  }, [vouchers]);
 
   return (
     <div className="flex col gap-2">

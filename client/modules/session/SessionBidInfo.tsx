@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPerson } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "../button/Button";
 import { removeSessionBid } from "./session.api";
+import { SessionUsers } from "./SessionUsers";
 
 export const SessionBidInfo = () => {
   const [_, profile] = useContext(ProfileContext);
@@ -15,11 +16,6 @@ export const SessionBidInfo = () => {
   }
 
   const { options, users } = data;
-
-  const readyNum = useMemo(
-    () => users.filter(({ ready }) => ready).length,
-    [users]
-  );
 
   const selection = useMemo(() => {
     const { optionId, value } = users.filter(({ id }) => {
@@ -43,25 +39,20 @@ export const SessionBidInfo = () => {
   };
 
   return selection != null ? (
-    <div>
+    <div className="flex col gap-1">
+      <p className="flex gap-1 align-bottom justify-center">
+        <span>You set</span> <h2>{selection.value}</h2> <span>on</span>{" "}
+        <strong>"{selection.text}"</strong>
+      </p>
+      <SessionUsers />
+
+      <p className="text-center opacity-50">waiting for start</p>
+
       <div>
-        <h2>{selection.value}</h2>
-        <p>
-          Your bid for <strong>"{selection.text}"</strong>
-        </p>
+        <Button secondary onClick={handleRemoveBig}>
+          Remove Bid
+        </Button>
       </div>
-      <div className="flex gap-1">
-        <span className="flex gap-1">
-          <FontAwesomeIcon icon={faCheck} />
-          {readyNum}
-        </span>
-        <span>/</span>
-        <span className="flex gap-1">
-          {users.length}
-          <FontAwesomeIcon icon={faPerson} />
-        </span>
-      </div>
-      <div><Button secondary onClick={handleRemoveBig}>Remove Bid</Button></div>
     </div>
   ) : null;
 };

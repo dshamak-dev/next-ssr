@@ -11,7 +11,7 @@ export const ProfileTransactionsPage: React.FC<Props> = ({}) => {
   }, [data?.transaction]);
 
   return (
-    <div className="flex w-full col gap-1 text-xs">
+    <div className="flex w-full col gap-1 text-xs p-1">
       {transactions.length
         ? transactions.map((it) => {
             const label = it.title || it.source;

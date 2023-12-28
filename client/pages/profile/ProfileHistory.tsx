@@ -20,7 +20,7 @@ export const ProfileHistoryPage: React.FC<Props> = ({}) => {
   }, [loadingHistory, historyData]);
 
   return (
-    <div className="flex w-full col gap-1 text-xs">
+    <div className="flex w-full col gap-1 text-xs p-1">
       {loadingHistory ? <Loader /> : null}
       {list.length
         ? list.map((it) => {

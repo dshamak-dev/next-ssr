@@ -4,9 +4,15 @@ import { Session } from "../../modules/session/Session";
 
 export default function SessionPage({ id }) {
   return (
-    <main>
+    <main className="session-page">
       <ProfileNavigation backUrl="/" />
       <ContestSessionProvider id={id}><Session /></ContestSessionProvider>
+      <style jsx>{`
+        .session-page {
+          display: grid;
+          grid-template-rows: auto 1fr;
+        }
+      `}</style>
     </main>
   );
 }

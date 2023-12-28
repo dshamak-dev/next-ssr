@@ -56,7 +56,7 @@ export const ProfileFormPage: React.FC<Props> = ({}) => {
   }
 
   return (
-    <article>
+    <article className="p-1">
       <div>Create Profile</div>
       {element}
     </article>

@@ -1,10 +1,9 @@
 import { useContext, useMemo } from "react";
 import { ContestSessionContext } from "./sessionContext";
 import { ProfileContext } from "../profile/profileContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPerson } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "../button/Button";
 import { joinSessionBid } from "./session.api";
+import { SessionUsers } from "./SessionUsers";
 
 export const SessionLanding = () => {
   const [_, profile] = useContext(ProfileContext);
@@ -13,8 +12,6 @@ export const SessionLanding = () => {
   if (data == null) {
     return null;
   }
-
-  const { options, users } = data;
 
   const handleJoin = async () => {
     const state = await joinSessionBid(data.id, profile.id);
@@ -25,13 +22,8 @@ export const SessionLanding = () => {
   };
 
   return (
-    <div>
-      <div className="flex gap-1">
-        <span className="flex gap-1">
-          {users.length}
-          <FontAwesomeIcon icon={faPerson} />
-        </span>
-      </div>
+    <div className="flex col gap-1">
+      <SessionUsers />
       <div>
         <Button secondary onClick={handleJoin}>
           Join Session

@@ -10,6 +10,10 @@
   &.justify-center {
     justify-content: center;
   }
+
+  &.align-bottom {
+    align-items: end;
+  }
 }
 .flex.col {
   flex-direction: column;
@@ -19,6 +23,9 @@
 }
 
 /* Gap */
+.gap {
+  gap: 0.5em;
+}
 .gap-1 {
   gap: 1em;
 }

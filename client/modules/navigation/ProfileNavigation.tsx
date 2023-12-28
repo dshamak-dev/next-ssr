@@ -19,7 +19,7 @@ export const ProfileNavigation = ({ backUrl }) => {
 
   return (
     <>
-      <nav className="flex items-center between">
+      <nav className="flex items-center between p-1">
         <div className="flex items-center grow-1">
           {backUrl ? (
             <LinkView href={backUrl}>

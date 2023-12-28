@@ -19,6 +19,10 @@ class Database {
     this.read();
   }
 
+  exist() {
+    return fs.existsSync(this.path);
+  }
+
   findIndex(entries) {
     return this.table.findIndex((rec) => {
       return Object.entries(entries).every(([key, value]) => {
@@ -80,6 +84,13 @@ class Database {
     const file = fs.readFileSync(this.path);
 
     return (this.table = JSON.parse(file));
+  }
+
+  clear() {
+    fs.writeFileSync(this.path, JSON.stringify([]), {
+      encoding: "utf8",
+      flag: "w",
+    });
   }
 
   write() {

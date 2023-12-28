@@ -7,6 +7,8 @@ import { SessionBidInfo } from "./SessionBidInfo";
 import { SessionLanding } from "./SessionLanding";
 import { SessionAdmin } from "./SessionAdmin";
 import { SessionInfo } from "./SessionInfo";
+import { Button } from "../button/Button";
+import Link from "next/link";
 
 export const Session = () => {
   const [loading, data, dispatch] = useContext(ContestSessionContext);
@@ -37,7 +39,12 @@ export const Session = () => {
       case SessionUserStageType.Failure:
       case SessionUserStageType.Success: {
         return (
-          <h3>you {userStage === SessionUserStageType.Failure ? "Lost" : "Won"}</h3>
+          <div className="flex col gap-1">
+            <h3 className="text-center uppercase">
+              you {userStage === SessionUserStageType.Failure ? "Lost" : "Won"}
+            </h3>
+            <Link href="/"><Button secondary>Close</Button></Link>
+          </div>
         );
       }
       case SessionUserStageType.Close: {
@@ -50,20 +57,32 @@ export const Session = () => {
   }, [data]);
 
   return (
-    <div>
+    <div className="p-1">
       {loading ? <Loader /> : null}
       {data != null ? (
-        <div>
-          <div>
-            <h1>
-              {data.name}#{data.id}
-            </h1>
-            {data.details ? <h3>{data.details}</h3> : null}
+        <div className="session-group">
+          <div className="flex col gap-1">
+            <div className="flex col gap-1">
+              <p className="text-base flex gap">
+                <span className="opacity-50">session tag</span>
+                <strong>
+                  {data.name}#{data.id}
+                </strong>
+              </p>
+              {data.details ? <h3>{data.details}</h3> : null}
+            </div>
+            <div>{content}</div>
           </div>
-          <div>{content}</div>
           <SessionAdmin />
         </div>
       ) : null}
+      <style jsx>{`
+        .session-group {
+          display: grid;
+          grid-template-rows: 1fr auto;
+          height: 100%;
+        }
+      `}</style>
     </div>
   );
 };

@@ -23,22 +23,27 @@ export const IndexPage = () => {
         <span className="highlight">winner</span>
       </h1>
       <div className="controls flex col gap-1 grow-1">
-        <Button onClick={handleCreateSession}>Create</Button>
+        <Button onClick={handleCreateSession} className="uppercase">
+          Create
+        </Button>
         <PopupButton
-          buttonProps={{ primary: true }}
+          buttonProps={{ primary: true, className: "uppercase" }}
           onText="cancel"
           offText="join"
         >
           <Form
             initialData={{}}
-            fields={[
-              {
-                id: "sessionId",
-                type: "text",
-                required: true,
-                label: "Session Id",
-              },
-            ] as any[]}
+            fields={
+              [
+                {
+                  id: "sessionId",
+                  type: "text",
+                  required: true,
+                  label: "Room Tag",
+                  placeholder: "Enter Room Tag",
+                },
+              ] as any[]
+            }
             onSubmit={async (e, { sessionId }) => {
               const session = await getSession(sessionId).catch((err) => null);
 

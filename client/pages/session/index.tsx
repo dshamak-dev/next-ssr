@@ -62,7 +62,7 @@ export const SessionFormPage = () => {
   return (
     <main>
       <ProfileNavigation backUrl="/" />
-      <div>{element}</div>
+      <div className="p-1">{element}</div>
     </main>
   );
 };

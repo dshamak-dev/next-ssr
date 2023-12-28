@@ -14,7 +14,7 @@ export const ProfileInfoPage: React.FC<Props> = ({}) => {
     }
 
     return (
-      <div className="flex col gap-1 text-xs">
+      <div className="flex col gap-1 text-xs p-1">
         <Label text="name" value={profile.displayName} className="" />
         <Label text="email" value={profile.email} />
       </div>

@@ -113,7 +113,7 @@ export const useForm = ({
 
   const element = useMemo(() => {
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex col gap-1">
         {fields.map(renderInput)}
         <Button secondary>Submit</Button>
       </form>

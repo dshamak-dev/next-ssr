@@ -93,7 +93,7 @@ export const ProfilePage = () => {
 
     if (addAssetsController) {
       return <>
-        <ProfileAssets />
+        <div className="p-1"><ProfileAssets /></div>
         <div className={styles.contentScroll}>{renderer()}</div>
       </>;
     }
