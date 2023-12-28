@@ -3,11 +3,6 @@
   text-transform: capitalize;
 }
 
-/* Align */
-.text-center {
-  text-align: center;
-}
-
 /* Size */
 .text-xl {
   font-size: 2rem;
@@ -28,4 +23,18 @@
 }
 .text-red {
   color: var(--red);
+}
+
+/* Align */
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
+
+/* Overflow */
+.text-elipsis {
+  overflow: hidden;
+  text-overflow: elipsis;
 }

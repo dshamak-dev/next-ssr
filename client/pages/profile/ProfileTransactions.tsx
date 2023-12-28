@@ -11,19 +11,37 @@ export const ProfileTransactionsPage: React.FC<Props> = ({}) => {
   }, [data?.transaction]);
 
   return (
-    <div className="flex w-full col gap-1">
+    <div className="flex w-full col gap-1 text-xs">
       {transactions.length
         ? transactions.map((it) => {
             const label = it.title || it.source;
+            // const dateLabel = it.createdAt
+            //   ? new Date(it.createdAt).toLocaleDateString("us", {
+            //       year: "2-digit",
+            //       month: "short",
+            //       day: "numeric",
+            //     })
+            //   : null;
 
             return (
-              <div key={it.id} className="flex items-center between w-full">
-                <span>{label || "anonym"}</span>
-                <span>{it.value}</span>
+              <div
+                key={it.id}
+                className="transaction-item flex items-center between w-full"
+              >
+                <span className="opacity-50">{label || "anonym"}</span>
+                {/* <span className="opacity-50 text-center">{dateLabel}</span> */}
+                <span className="text-right">{it.value}</span>
               </div>
             );
           })
         : "no transactions"}
+      <style jsx>{`
+        .transaction-item {
+          display: grid;
+          grid-template-columns: 1fr  auto;
+          gap: 1rem;
+        }
+      `}</style>
     </div>
   );
 };

@@ -72,15 +72,14 @@ export const ProfileAssets: React.FC<{}> = ({}) => {
           position: fixed;
           width: 100%;
           height: 100%;
-          background-color: var(--black);
+          background-color: var(--green);
           opacity: 0.4;
           z-index: 0;
         }
 
         .profile-transaction {
           position: relative;
-          width: max-content;
-          min-width: 320px;
+          width: 100%;
           margin: 0 auto;
           padding: 1rem 1rem 1.5rem;
           background-color: var(--green);
@@ -95,7 +94,7 @@ export const ProfileAssets: React.FC<{}> = ({}) => {
 
         .profile-transaction_form-cover {
           position: absolute;
-          top: 100%;
+          top: calc(100% - 1px);
           width: 100%;
           padding: 1.5rem 1rem 1rem;
           background-color: var(--green);

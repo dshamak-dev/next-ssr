@@ -13,7 +13,7 @@ export const postTransaction = (profileId, body) => {
 };
 
 export const getProfileHistory = (profileId) => {
-  return appApi.get(`users/${profileId}/history`);
+  return appApi.get(`users/${profileId}/history`).then(res => res?.json());
 };
 
 export const useProfileVoucher = (profileId, voucher) => {

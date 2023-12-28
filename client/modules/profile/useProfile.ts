@@ -20,7 +20,7 @@ const profileReducer = (state, action) => {
     }
     default: {
       return {
-        data: null,
+        ...state,
         loading: false,
       };
     }

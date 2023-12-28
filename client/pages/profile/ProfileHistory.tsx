@@ -8,19 +8,19 @@ import Link from "next/link";
 interface Props {}
 
 export const ProfileHistoryPage: React.FC<Props> = ({}) => {
-  const [loading, data, logged, dispatch] = useContext(ProfileContext);
-  const [loadingHistory, history, requestHistory] = useApi(
-    () => getProfileHistory(data?.id),
+  const [loading, profile, logged, dispatch] = useContext(ProfileContext);
+  const [loadingHistory, historyData, requestHistory] = useApi(
+    () => getProfileHistory(profile?.id),
     [],
-    true
+    profile?.id != null
   );
 
   const list = useMemo(() => {
-    return history || [];
-  }, [history]);
+    return historyData || [];
+  }, [loadingHistory, historyData]);
 
   return (
-    <div className="flex w-full col gap-1">
+    <div className="flex w-full col gap-1 text-xs">
       {loadingHistory ? <Loader /> : null}
       {list.length
         ? list.map((it) => {
