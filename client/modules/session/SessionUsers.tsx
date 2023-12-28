@@ -11,7 +11,7 @@ export const SessionUsers: React.FC = () => {
   const total = useMemo(() => users?.length || 0, [users?.length]);
 
   const readyNum = useMemo(
-    () => users.filter(({ ready }) => ready).length,
+    () => users?.filter(({ ready }) => ready)?.length || 0,
     [users]
   );
 
