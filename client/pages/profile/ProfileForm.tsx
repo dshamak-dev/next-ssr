@@ -62,3 +62,5 @@ export const ProfileFormPage: React.FC<Props> = ({}) => {
     </article>
   );
 };
+
+export default ProfileFormPage;

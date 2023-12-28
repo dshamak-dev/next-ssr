@@ -27,3 +27,5 @@ export const ProfileTransactionsPage: React.FC<Props> = ({}) => {
     </div>
   );
 };
+
+export default ProfileTransactionsPage;

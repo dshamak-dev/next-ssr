@@ -28,3 +28,5 @@ export const ProfileInfoPage: React.FC<Props> = ({}) => {
 
   return <article>{profileContent}</article>;
 };
+
+export default ProfileInfoPage;

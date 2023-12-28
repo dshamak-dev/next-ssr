@@ -36,3 +36,5 @@ export const ProfileHistoryPage: React.FC<Props> = ({}) => {
     </div>
   );
 };
+
+export default ProfileHistoryPage;
