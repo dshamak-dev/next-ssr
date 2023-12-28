@@ -87,10 +87,9 @@ class Database {
   }
 
   clear() {
-    fs.writeFileSync(this.path, JSON.stringify([]), {
-      encoding: "utf8",
-      flag: "w",
-    });
+    this.table = [];
+    
+    this.write();
   }
 
   write() {
