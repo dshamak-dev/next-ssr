@@ -6,43 +6,6 @@ export const getAPIDomain = () => {
   }
 };
 
-// export const post = (domain, path, props, body) => {
-//   return fetch(`${domain}/api/${path}`, {
-//     method: "post",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     ...props,
-//     body: body,
-//   });
-// };
-
-// export const put = (domain, path, props, body) => {
-//   return fetch(`${domain}/api/${path}`, {
-//     method: "put",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     ...props,
-//     body: body,
-//   });
-// };
-
-// export const get = (domain, path, props) => {
-//   return fetch(`${domain}/api/${path}`, {
-//     ...props,
-//   });
-// };
-
-// export const del = (domain, path, props) => {
-//   return fetch(`${domain}/api/${path}`, {
-//     ...props,
-//     method: "delete",
-//   });
-// };
-
 export const waitFor = (ms) => {
   return new Promise((res) => {
     setTimeout(res, ms);
@@ -81,10 +44,10 @@ class Api {
       },
       body: requestBody,
       ...other,
-    })
+    } as any)
       .then(async (res) => {
         let error = null;
-        let response = null;
+        let response: any = null;
 
         try {
           if (res.json) {

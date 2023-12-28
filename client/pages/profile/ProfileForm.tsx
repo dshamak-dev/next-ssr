@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { useAuth } from "../../modules/auth/useAuth";
 import { getProfile, postProfile } from "../../modules/profile/profile.api";
-import { waitFor } from "../../api/api.model";
+import { waitFor } from "../../support/api.model";
 import { Loader } from "../../modules/loader/Loader";
 import { Label } from "../../modules/label/Label";
 import { ProfileContext } from "../../modules/profile/profileContext";

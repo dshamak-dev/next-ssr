@@ -1,4 +1,4 @@
-import { appApi, waitFor } from "../../api/api.model";
+import { appApi, waitFor } from "../../support/api.model";
 import { DTOSessionAction, SessionState } from "./session.model";
 
 export const getSession = (id): Promise<SessionState | null> => {

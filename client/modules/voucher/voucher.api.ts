@@ -1,4 +1,4 @@
-import { appApi, waitFor } from "../../api/api.model";
+import { appApi, waitFor } from "../../support/api.model";
 import { IVoucher } from "./voucher.model";
 
 export const getVouchers = (profileId): Promise<IVoucher[] | null> => {

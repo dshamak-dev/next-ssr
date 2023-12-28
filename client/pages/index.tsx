@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { PopupButton } from "../modules/popup/PopupButton";
 import { Form } from "../modules/form/Form";
 import { getSession } from "../modules/session/session.api";
-import { FormField } from "../modules/form/useForm";
 
 export const IndexPage = () => {
   const { push } = useRouter();

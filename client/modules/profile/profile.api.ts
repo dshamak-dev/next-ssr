@@ -1,4 +1,4 @@
-import { appApi, waitFor } from "../../api/api.model";
+import { appApi, waitFor } from "../../support/api.model";
 
 export const getProfile = async (id) => {
   return appApi.get(`/users?authId=${id}`);
