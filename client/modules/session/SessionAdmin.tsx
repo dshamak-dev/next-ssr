@@ -78,6 +78,7 @@ export const SessionAdmin = () => {
                     {
                       id: "optionId",
                       type: "select",
+                      required: true,
                       options,
                       inputProps: {
                         style: { minWidth: "200px" },
