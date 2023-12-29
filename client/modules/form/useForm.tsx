@@ -21,7 +21,7 @@ export interface FormField {
   label?: string;
   placeholder?: string;
   className?: string;
-  inputProps?: Record<string, string | number | boolean>;
+  inputProps?: Record<string, string | number | boolean | Object>;
   options?: { text: string; value: any }[];
   valide?: (value: any) => boolean;
   required?: boolean;

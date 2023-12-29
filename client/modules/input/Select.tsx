@@ -6,7 +6,7 @@ export const Select = ({ options, inputProps, ...props }) => {
   return (
     <>
       <div className="input-container">
-        <select className="input-field" {...props}>
+        <select className="input-field" {...inputProps} {...props}>
           <option disabled value="">Select Option</option>
           {options.map(({ id, text }) => {
             return (
