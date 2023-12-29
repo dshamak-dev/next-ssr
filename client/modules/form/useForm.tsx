@@ -4,6 +4,7 @@ import { Button } from "../button/Button";
 import { Select } from "../input/Select";
 import { NumberInput } from "../input/NumberInput";
 import { TagInput } from "../input/TagInput";
+import { getFormEntries } from "./form.support";
 
 export interface FormField {
   type?:
@@ -53,28 +54,9 @@ export const useForm = ({
     (e) => {
       e.preventDefault();
 
-      const _formData = new FormData(e.target);
-      const _formFields = fields.reduce((prev, it) => {
-        const type = it.type || "text";
-        const id = it.id;
-        const value = _formData.get(id) || "";
-        let fieldValue: any = value;
+      const entries = getFormEntries(e.target);
 
-        switch (type) {
-          case "number": {
-            fieldValue = Number(value);
-            break;
-          }
-          case "list": {
-            fieldValue = formData[id];
-            break;
-          }
-        }
-
-        return Object.assign(prev, { [id]: fieldValue });
-      }, {});
-
-      const result = _formFields;
+      const result = Object.assign({}, entries, formData);
 
       if (onSubmit) {
         onSubmit(e, result);
@@ -121,7 +103,7 @@ export const useForm = ({
         <Button secondary>Submit</Button>
       </form>
     );
-  }, [fields]);
+  }, [fields, handleSubmit]);
 
   return { element, formData };
 };

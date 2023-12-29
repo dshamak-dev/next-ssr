@@ -68,11 +68,19 @@ export const ContestSessionProvider = ({ id, children }) => {
     }
   }, [subscribeState]);
 
+  const session = useMemo(() => {
+    if (!data || data.error) {
+      return null;
+    }
+
+    return data;
+  }, [data]);
+
   return (
     <ContestSessionContext.Provider
       value={[
         loading as boolean,
-        data as SessionState | null,
+        session as SessionState | null,
         dispatch,
         sessionError,
       ]}

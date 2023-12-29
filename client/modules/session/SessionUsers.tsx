@@ -15,17 +15,17 @@ export const SessionUsers: React.FC = () => {
     [users]
   );
 
-  if (!total) {
-    return null;
-  }
-
   return (
     <div className="flex gap-1 justify-center">
-      <span className="flex gap-1">
-        <FontAwesomeIcon icon={faCheck} />
-        {readyNum}
-      </span>
-      <span>/</span>
+      {readyNum ? (
+        <>
+          <span className="flex gap-1">
+            <FontAwesomeIcon icon={faCheck} />
+            {readyNum}
+          </span>
+          <span>/</span>
+        </>
+      ) : null}
       <span className="flex gap-1">
         {total}
         <FontAwesomeIcon icon={faPerson} />

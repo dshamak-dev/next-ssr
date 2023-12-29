@@ -75,7 +75,7 @@ export const Session = () => {
         return <h3>no permission to access</h3>;
       }
       default: {
-        return <h3>nothing here to watch</h3>;
+        return <LinkView href="/">The room is empty, go home</LinkView>;
       }
     }
   }, [data, sessionError]);
