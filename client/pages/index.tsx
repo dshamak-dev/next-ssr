@@ -45,14 +45,16 @@ export const IndexPage = () => {
               ] as any[]
             }
             onSubmit={async (e, { sessionId }) => {
-              const session = await getSession(sessionId).catch((err) => null);
+              const session = await getSession(sessionId.toLowerCase()).catch(
+                (err) => null
+              );
 
               if (!session) {
                 alert("no such session");
                 return;
               }
 
-              push(`/session/${sessionId}`);
+              push(`/session/${session.id}`);
             }}
           />
         </PopupButton>

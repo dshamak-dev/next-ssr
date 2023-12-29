@@ -24,11 +24,14 @@ export const ProfileHistoryPage: React.FC<Props> = ({}) => {
       {loadingHistory ? <Loader /> : null}
       {list.length
         ? list.map((it) => {
+            const dateLabel = it.updatedAt ? new Date(it.updatedAt).toLocaleDateString() : null
+
             return (
               <div key={it.id} className="flex items-center between w-full">
-                <Link href={`/session/${it.id}`}>
-                  {it.name}#{it.id}
+                <Link href={it.url}>
+                  {it.title || `#${it.id}`}
                 </Link>
+                <span>{dateLabel}</span>
               </div>
             );
           })

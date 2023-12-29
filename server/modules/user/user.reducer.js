@@ -10,11 +10,17 @@ const UserActionTypes = {
   ApplyVoucher: 5,
 };
 
-const blockuserAssets = async (user, payload) => {
-  const blockedAssets = user.blockedAssets || [];
-  let assets = Number(user.assets) || 0;
+const blockUserAssets = async (user, payload) => {
+  let assets = Number(user?.assets) || 0;
+  const value = Number(payload.value) || 0;
 
-  assets -= Number(payload.value);
+  if (!value || assets < value) {
+    return ['Not enough assets', user];
+  }
+
+  const blockedAssets = user.blockedAssets || [];
+
+  assets -= value;
 
   blockedAssets.push(
     Object.assign(
@@ -39,6 +45,11 @@ const applyUserTransaction = async (user, payload) => {
   let assets = Number(user.assets) || 0;
 
   const transaction = new Transaction(payload);
+  const value = Number(payload.value) || 0;
+
+  if (transaction.type === 'remove' && assets < value ) {
+    return ['Not enough assets', user];
+  }
 
   assets = transaction.apply(assets);
 
@@ -76,7 +87,7 @@ const applyUserVoucher = async (user, voucher) => {
 };
 
 const userActions = {
-  [UserActionTypes.BlockAssets]: blockuserAssets,
+  [UserActionTypes.BlockAssets]: blockUserAssets,
   [UserActionTypes.ApplyTransaction]: applyUserTransaction,
   [UserActionTypes.ApplyVoucher]: applyUserVoucher,
   [UserActionTypes.ResolveBlockedAssets]: async (user, payload) => {

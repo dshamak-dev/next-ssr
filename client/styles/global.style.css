@@ -19,7 +19,9 @@ html {
 
 @import '../styles/text.style.css';
 @import '../styles/flex.style.css';
+@import '../styles/spacing.style.css';
 @import '../styles/common.style.css';
+
 
 img.invert {
   filter: invert(1);
@@ -45,6 +47,10 @@ img.invert {
   width: fit-content !important;
 }
 
+.min-w-fit {
+  min-width: fit-content !important;
+}
+
 .w-2 {
   width: 2rem;
 }
@@ -56,12 +62,8 @@ img.invert {
   border: 1px solid currentColor;
 }
 
-.p-1 {
-  padding: 1em;
-}
-
-.p-0 {
-  padding: 0;
+.rounded {
+  border-radius: 1rem;
 }
 
 body,

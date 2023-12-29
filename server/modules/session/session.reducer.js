@@ -119,7 +119,7 @@ const sessionActions = {
           UserActionTypes.BlockAssets,
           {
             value,
-            source: session.name,
+            source: session.title,
             sourceId: session.id,
           },
           true
@@ -198,6 +198,7 @@ const sessionActions = {
     );
 
     data.stage = SessionStageType.Close;
+    data.closedAt = Date.now();
 
     return [error, data];
   },

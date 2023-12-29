@@ -1,0 +1,23 @@
+.p-x-1 {
+  padding-left: 1rem;
+  padding-right: 1rem; 
+}
+.p-x {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+}
+
+.p-l-1 {
+  padding-left: 1rem; 
+}
+
+.p-1 {
+  padding: 1em;
+}
+.p-small {
+  padding: 0.2rem;
+}
+
+.p-0 {
+  padding: 0;
+}

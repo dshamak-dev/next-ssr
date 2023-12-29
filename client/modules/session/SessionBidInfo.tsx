@@ -38,7 +38,7 @@ export const SessionBidInfo = () => {
   return selection != null ? (
     <div className="flex col gap-1">
       <p className="flex gap-1 align-bottom justify-center">
-        <span>You set</span> <h2>{selection.value}</h2> <span>on</span>{" "}
+        <span>You set</span> <strong className="text-lg">{selection.value}</strong> <span>on</span>{" "}
         <strong>"{selection.text}"</strong>
       </p>
 

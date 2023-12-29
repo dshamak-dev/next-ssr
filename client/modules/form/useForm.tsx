@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "../input/Input";
 import { Button } from "../button/Button";
 import { Select } from "../input/Select";
+import { NumberInput } from "../input/NumberInput";
+import { TagInput } from "../input/TagInput";
 
 export interface FormField {
   type?:
@@ -17,6 +19,8 @@ export interface FormField {
   id: string;
   label?: string;
   placeholder?: string;
+  className?: string;
+  inputProps?: Record<string, string | number | boolean>;
   options?: { text: string; value: any }[];
   valide?: (value: any) => boolean;
   required?: boolean;
@@ -51,8 +55,9 @@ export const useForm = ({
 
       const _formData = new FormData(e.target);
       const _formFields = fields.reduce((prev, it) => {
-        const type = it.type || 'text';
-        const value = _formData.get(it.id) || "";
+        const type = it.type || "text";
+        const id = it.id;
+        const value = _formData.get(id) || "";
         let fieldValue: any = value;
 
         switch (type) {
@@ -61,52 +66,50 @@ export const useForm = ({
             break;
           }
           case "list": {
-            fieldValue = (value as string).trim().split(" ");
+            fieldValue = formData[id];
             break;
           }
         }
 
-        return Object.assign(prev, { [it.id]: fieldValue });
+        return Object.assign(prev, { [id]: fieldValue });
       }, {});
 
+      const result = _formFields;
+
       if (onSubmit) {
-        onSubmit(e, _formFields);
+        onSubmit(e, result);
       }
     },
-    [onSubmit]
+    [onSubmit, formData]
   );
 
   const renderInput = (field) => {
+    const { id, options, label, inputProps = {}, ...props } = field;
+
+    const commonProps = Object.assign(
+      {
+        id: id,
+        name: id,
+        placeholder: `Ender ${label || id}`,
+        defaultValue: formData ? formData[field.id] || "" : "",
+        inputProps,
+        onChange: (e) => handleFieldChange(id, e.target.value),
+      },
+      props
+    );
+
     switch (field.type) {
+      case "number": {
+        return <NumberInput key={id} {...commonProps} />;
+      }
       case "select": {
-        const { id, options, label, ...props } = field;
-        return (
-          <Select
-            options={options}
-            label={label}
-            placeholder={`Ender ${label || id}`}
-            {...props}
-            key={id}
-            id={id}
-            name={id}
-            onChange={(e) => handleFieldChange(id, e.target.value)}
-          />
-        );
+        return <Select key={id} {...commonProps} options={options} />;
+      }
+      case "list": {
+        return <TagInput key={id} {...commonProps} />;
       }
       default: {
-        return (
-          <Input
-            placeholder={`Ender ${field.label || field.id}`}
-            {...field}
-            key={field.id}
-            label={field.label}
-            id={field.id}
-            name={field.id}
-            type={field.type}
-            defaultValue={formData ? formData[field.id] || "" : ""}
-            onChange={(e) => handleFieldChange(field.id, e.target.value)}
-          />
-        );
+        return <Input key={id} {...commonProps} />;
       }
     }
   };

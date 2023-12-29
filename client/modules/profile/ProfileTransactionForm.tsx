@@ -78,6 +78,7 @@ export const ProfileTransactionForm: React.FC<Props> = ({ onClose }) => {
                   label: "Voucher",
                   placeholder: "Enter Voucher",
                   required: true,
+                  className: "primary"
                 },
               ]}
               onSubmit={handleSubmitVoucher}

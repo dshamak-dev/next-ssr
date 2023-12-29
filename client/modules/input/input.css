@@ -1,18 +1,43 @@
 /* Input container */
-.input_container {
+.input-container {
   position: relative;
-  margin: 20px;
+  background-color: var(--black);
+  color: var(--white);
+  border-radius: 2rem;
+  overflow: hidden;
 }
 
-.input_container .input-field {
+.input-container.primary {
+  background-color: var(--white);
+  color: var(--black);
+}
+
+.input-container .input-field {
   display: block;
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 0.5rem 1rem;
+  font-size: 1em;
   border: none;
-  border-bottom: 2px solid #ccc;
   outline: none;
   background-color: transparent;
+  color: inherit;
+}
+
+.input-container select.input-field {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 2rem;
+  width: 100%;
+}
+
+.input-container .input-control-icon {
+  position: absolute;
+  height: 1rem;
+  width: 1rem;
+  right: 1rem;
+  top: calc(50% - 0.5rem);
+  color: inherit;
+  pointer-events: none;
 }
 
 /* Input label */

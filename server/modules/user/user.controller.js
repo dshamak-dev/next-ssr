@@ -43,11 +43,15 @@ const postHistory = async (id, sessionId) => {
   const nextHistory = record.history || [];
 
   if (!nextHistory.includes(sessionId)) {
-    nextHistory.push(sessionId);
+    nextHistory.push({
+      sourceId: sessionId,
+      updatedAt: Date.now(),
+      sourceType: "session",
+    });
   }
 
   return await update(id, { history: nextHistory });
-} 
+};
 
 const remove = async () => {};
 

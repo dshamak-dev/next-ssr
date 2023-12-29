@@ -2,7 +2,10 @@ const express = require("express");
 const { get, post, update, postHistory } = require("./user.controller");
 const { get: getSession } = require("../session/session.controller");
 const { reducer, UserActionTypes } = require("./user.reducer.js");
-const { reducer: voucherReducer, VoucherActionType } = require("../voucher/voucher.reducer.js");
+const {
+  reducer: voucherReducer,
+  VoucherActionType,
+} = require("../voucher/voucher.reducer.js");
 
 const router = express.Router();
 
@@ -79,10 +82,14 @@ router.post("/users/:id/transaction", async (req, res) => {
 router.post("/users/:id/voucher", async (req, res) => {
   const { id } = req.params;
 
-  const [voucherError, voucher] = await voucherReducer(VoucherActionType.Use, { tag: req.body?.voucher }, true);
+  const [voucherError, voucher] = await voucherReducer(
+    VoucherActionType.Use,
+    { tag: req.body?.voucher },
+    true
+  );
 
   if (voucherError || !voucher) {
-    return res.status(400).json({ error: voucherError || 'Voucher not found' });
+    return res.status(400).json({ error: voucherError || "Voucher not found" });
   }
 
   const [error, user] = await reducer(
@@ -123,10 +130,32 @@ router.get("/users/:id/history", async (req, res) => {
     return res.status(404).json(null);
   }
 
-  const history = record.history || [];
+  let history = record.history || [];
+  // todo: remove migration
+  history = history.map((it) => {
+    if (typeof it !== "object") {
+      return { sourceId: it, sourceType: "session" };
+    }
+    return it;
+  });
+
   const historyRecords = await Promise.all(
-    history.map((sessionId) => {
-      return getSession({ id: sessionId });
+    history.map(({ sourceId, sourceType, updatedAt }) => {
+      if (sourceType !== "session") {
+        return null;
+      }
+
+      return getSession({ id: sourceId }).then((res) => {
+        if (!res) {
+          return res;
+        }
+
+        return {
+          title: res.title,
+          url: `/${sourceType}/${sourceId}`,
+          updatedAt,
+        };
+      });
     })
   );
 

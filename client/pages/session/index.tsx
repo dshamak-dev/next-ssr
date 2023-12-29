@@ -4,6 +4,7 @@ import { FormField, useForm } from "../../modules/form/useForm";
 import { useRouter } from "next/router";
 import { ProfileContext } from "../../modules/profile/profileContext";
 import { postSession } from "../../modules/session/session.api";
+import { useNotification } from "../../modules/notification/useNotification";
 
 const sessionFields: FormField[] = [
   {
@@ -19,6 +20,7 @@ const sessionFields: FormField[] = [
 
 export const SessionFormPage = () => {
   const router = useRouter();
+  const { show } = useNotification();
   const [_, profile] = useContext(ProfileContext);
   const [busy, setBusy] = useState(false);
 
@@ -28,9 +30,15 @@ export const SessionFormPage = () => {
         return;
       }
 
-      setBusy(true);
-
       const { options, ...fields } = formData;
+      const optionsNum = options?.length || 0;
+
+      if (optionsNum < 1) {
+        show('At least two options required');
+        return;
+      }
+
+      setBusy(true);
 
       const data = Object.assign(
         {

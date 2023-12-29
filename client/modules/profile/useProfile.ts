@@ -32,7 +32,7 @@ export const useProfile = () => {
 
   const [{ data, loading }, dispatch] = useReducer(profileReducer, {
     data: null,
-    loading: false,
+    loading: status === 'loading',
   });
 
   const sync = useCallback(() => {

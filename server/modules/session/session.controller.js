@@ -30,7 +30,7 @@ const post = async (data) => {
     return record;
   }
 
-  record = Object.assign(data, { id: uid() });
+  record = Object.assign(data, { id: uid().toLowerCase() });
 
   _db.add(record);
 
