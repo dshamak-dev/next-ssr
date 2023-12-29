@@ -119,7 +119,8 @@ const sessionActions = {
           UserActionTypes.BlockAssets,
           {
             value,
-            source: session.title,
+            title: session.title,
+            sourceType: 'session',
             sourceId: session.id,
           },
           true
@@ -175,7 +176,7 @@ const sessionActions = {
 
         const transiaction = {
           value,
-          title: data.name,
+          title: data.title,
           sourceId: data.id,
           sourceType: "session",
           type: 'add'

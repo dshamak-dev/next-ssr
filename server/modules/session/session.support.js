@@ -9,9 +9,11 @@ methods.getSessionSummary = (session) => {
       optionsTotal[optionId] = 0;
     }
 
-    optionsTotal[optionId] += value;
+    const formatedValue = Number(value) || 0;
 
-    total += value;
+    optionsTotal[optionId] += formatedValue;
+
+    total += formatedValue;
   });
 
   return {
@@ -42,7 +44,7 @@ methods.getSessionPrizePerUser = (session) => {
     const state = {
       optionId,
       rate,
-      value: total * rate,
+      value: Number(total) * rate,
     };
 
     return { ...prev, [id]: state };
