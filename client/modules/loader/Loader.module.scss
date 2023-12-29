@@ -1,0 +1,27 @@
+@keyframes rotation {
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(361deg);
+  }
+}
+
+.loader {
+  position: relative;
+  width: 0;
+  height: 0;
+  top: 1px;
+  left: 50%;
+
+  & .icon {
+    position: relative;
+    top: 0;
+    width: 1rem;
+    height: 1rem;
+    animation-name: rotation;
+    animation-duration: 1.5s;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+  }
+}
