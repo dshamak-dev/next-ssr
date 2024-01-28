@@ -18,7 +18,15 @@ router.post("/auth", async (req, res) => {
     return res.status(400).json(null).end();
   }
 
-  let user = await get({ email });
+  let user;
+
+  try {
+    user = await get({ email });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(400).json(null).end();
+  }
 
   if (!user) {
     console.log('create', { email, password });
