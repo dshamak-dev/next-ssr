@@ -9,13 +9,24 @@ import { useNotification } from "../../modules/notification/useNotification";
 const sessionFields: FormField[] = [
   {
     id: "title",
-    label: "Room Title",
-    placeholder: "Enter Room Title",
+    label: "Session Title",
+    placeholder: "Enter Session Title",
     type: "string",
     required: true,
   },
-  { id: "description", label: "Description", type: "string" },
-  { id: "options", label: "Options", type: "list", required: true },
+  {
+    id: "description",
+    label: "Describe your contest",
+    placeholder: "Enter Description",
+    type: "string",
+  },
+  {
+    id: "options",
+    label: "Answer Variants",
+    type: "list",
+    required: true,
+    defaultValue: new Array(2).fill(""),
+  },
 ];
 
 export const SessionFormPage = () => {
@@ -34,7 +45,7 @@ export const SessionFormPage = () => {
       const optionsNum = options?.length || 0;
 
       if (optionsNum < 1) {
-        show('At least two options required');
+        show("At least two options required");
         return;
       }
 

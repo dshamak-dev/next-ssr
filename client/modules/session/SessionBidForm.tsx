@@ -36,12 +36,16 @@ export const SessionBidForm = () => {
       {
         type: "number",
         id: "value",
+        label: 'Your Bid',
+        placeholder: 'Enter bid value',
         inputProps: { min: 1, max: profile?.assets, autoComplete: "off" },
         required: true,
       },
       {
         type: "select",
         id: "option",
+        label: 'Your Answer',
+        placeholder: 'Select Answer',
         options: data.options,
         required: true,
       },

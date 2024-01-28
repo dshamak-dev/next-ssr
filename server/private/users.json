@@ -1,1 +1,317 @@
-[{"displayName":"dmitrysh","email":"dmitry.shamak.dev@gmail.com","authId":63905053,"admin":true,"id":"3d05a7e3","transactions":[{"value":"5","id":1702307822745,"title":"personal transfer"},{"value":"5","id":1702307855130,"title":"personal transfer"},{"value":"-10","id":1702307906650,"title":"personal transfer"},{"value":"-10","id":1702308005467,"title":"personal transfer"},{"value":"5","id":1702308057312,"title":"personal transfer"},{"createdAt":1703232502192,"id":"c4ea48a3","value":35,"title":"Dmitrysh Room 2","sourceId":"825a0fdb","sourceType":"session"},{"createdAt":1703232980377,"id":"e83428da","value":35,"title":"Dmitrysh Room 2","sourceId":"825a0fdb","sourceType":"session"},{"id":"9bbb6645","createdAt":1703233876624,"value":-30,"title":"Lime Room 2","sourceType":"session","sourceId":"d7014ebd"},{"id":"4d1f5d4b","createdAt":1703327365548,"value":-50,"title":"Dmitrysh Room 3","sourceType":"session","sourceId":"b8354c00"},{"id":"f61b916f","createdAt":1703327377779,"value":70,"title":"Dmitrysh Room 3","sourceId":"b8354c00","sourceType":"session"},{"id":"c104bf63","createdAt":1703327864141,"value":-20,"title":"Dmitrysh Room 4","sourceType":"session","sourceId":"d3627640"},{"id":"8406ccb1","createdAt":1703327872910,"value":120,"source":"Dmitrysh Room 4","sourceId":"d3627640","sourceType":"session"},{"id":"7eca6726","createdAt":1703328309295,"value":-40,"title":"SRoom","sourceType":"session","sourceId":"3c51e8f0"},{"id":"064484d3","value":50,"type":"add","sourceId":"0fe90e7f","sourceType":"voucher","title":"winter50","createdAt":1703668040394},{"id":"f5de9b69","value":10,"type":"add","sourceId":"c84a1ae7","sourceType":"voucher","title":"winter10","createdAt":1703668591037},{"id":"12c3cb09","value":100,"type":"add","sourceId":"990124fd","sourceType":"voucher","title":"winter100","createdAt":1703670997421}],"assets":700,"history":["9ac0e9e3","825a0fdb","b8354c00","d3627640","3c51e8f0"],"blockedAssets":[]},{"displayName":"Dmitry Lime","email":"dmitryzlodey@gmail.com","authId":"102728066060322593478","id":"31e25179","assets":40,"transactions":[{"createdAt":1703067484353,"value":20,"id":1703067484346,"type":"personal transfer"},{"createdAt":1703233100745,"id":"6bb6b4b5","value":70,"source":"Lime Room","sourceId":"f24f61f8","sourceType":"session"},{"id":"4385140c","createdAt":1703233876624,"value":-20,"source":"Lime Room 2","sourceId":"d7014ebd"},{"id":"be786ed6","createdAt":1703235005804,"value":50,"source":"Lime Room 2","sourceId":"d7014ebd","sourceType":"session"}],"blockedAssets":[],"history":["f24f61f8","d7014ebd"]},{"displayName":"Dmitry Shamak","email":"dmitry.shamak.dev@gmail.com","authId":"116068537305458774346","admin":true,"id":"083b2e1c","assets":60,"blockedAssets":[],"transactions":[{"id":"34b5068c","createdAt":1703327365548,"value":-20,"source":"Dmitrysh Room 3","sourceId":"b8354c00"},{"id":"95e95729","createdAt":1703327864141,"value":-100,"source":"Dmitrysh Room 4","sourceId":"d3627640"},{"id":1703328226134,"createdAt":1703328226193,"value":280,"type":"personal transfer"},{"id":"46c92e94","createdAt":1703328309295,"value":-20,"source":"SRoom","sourceId":"3c51e8f0"},{"id":"4bce0bdd","createdAt":1703328314381,"value":60,"source":"SRoom","sourceId":"3c51e8f0","sourceType":"session"}],"history":["3c51e8f0"]}]
+[
+  {
+    "displayName": "dmitrysh",
+    "email": "dmitry.shamak.dev@gmail.com",
+    "authId": 63905053,
+    "admin": true,
+    "id": "3d05a7e3",
+    "transactions": [
+      { "value": "5", "id": 1702307822745, "title": "personal transfer" },
+      { "value": "5", "id": 1702307855130, "title": "personal transfer" },
+      { "value": "-10", "id": 1702307906650, "title": "personal transfer" },
+      { "value": "-10", "id": 1702308005467, "title": "personal transfer" },
+      { "value": "5", "id": 1702308057312, "title": "personal transfer" },
+      {
+        "createdAt": 1703232502192,
+        "id": "c4ea48a3",
+        "value": 35,
+        "title": "Dmitrysh Room 2",
+        "sourceId": "825a0fdb",
+        "sourceType": "session"
+      },
+      {
+        "createdAt": 1703232980377,
+        "id": "e83428da",
+        "value": 35,
+        "title": "Dmitrysh Room 2",
+        "sourceId": "825a0fdb",
+        "sourceType": "session"
+      },
+      {
+        "id": "9bbb6645",
+        "createdAt": 1703233876624,
+        "value": -30,
+        "title": "Lime Room 2",
+        "sourceType": "session",
+        "sourceId": "d7014ebd"
+      },
+      {
+        "id": "4d1f5d4b",
+        "createdAt": 1703327365548,
+        "value": -50,
+        "title": "Dmitrysh Room 3",
+        "sourceType": "session",
+        "sourceId": "b8354c00"
+      },
+      {
+        "id": "f61b916f",
+        "createdAt": 1703327377779,
+        "value": 70,
+        "title": "Dmitrysh Room 3",
+        "sourceId": "b8354c00",
+        "sourceType": "session"
+      },
+      {
+        "id": "c104bf63",
+        "createdAt": 1703327864141,
+        "value": -20,
+        "title": "Dmitrysh Room 4",
+        "sourceType": "session",
+        "sourceId": "d3627640"
+      },
+      {
+        "id": "8406ccb1",
+        "createdAt": 1703327872910,
+        "value": 120,
+        "source": "Dmitrysh Room 4",
+        "sourceId": "d3627640",
+        "sourceType": "session"
+      },
+      {
+        "id": "7eca6726",
+        "createdAt": 1703328309295,
+        "value": -40,
+        "title": "SRoom",
+        "sourceType": "session",
+        "sourceId": "3c51e8f0"
+      },
+      {
+        "id": "064484d3",
+        "value": 50,
+        "type": "add",
+        "sourceId": "0fe90e7f",
+        "sourceType": "voucher",
+        "title": "winter50",
+        "createdAt": 1703668040394
+      },
+      {
+        "id": "f5de9b69",
+        "value": 10,
+        "type": "add",
+        "sourceId": "c84a1ae7",
+        "sourceType": "voucher",
+        "title": "winter10",
+        "createdAt": 1703668591037
+      },
+      {
+        "id": "12c3cb09",
+        "value": 100,
+        "type": "add",
+        "sourceId": "990124fd",
+        "sourceType": "voucher",
+        "title": "winter100",
+        "createdAt": 1703670997421
+      },
+      {
+        "id": "6e1585af",
+        "value": -20,
+        "sourceId": "b7b141ac",
+        "sourceType": "unknown",
+        "title": "anonymous",
+        "createdAt": 1703781602283,
+        "source": "Dmitrysh 1"
+      },
+      {
+        "id": "446fb823",
+        "value": 12,
+        "type": "add",
+        "sourceId": "1c4d7caf",
+        "sourceType": "voucher",
+        "title": "winter12",
+        "createdAt": 1703837423672
+      },
+      {
+        "id": "faa1fe83",
+        "value": -20,
+        "sourceId": "5f2293c9",
+        "sourceType": "unknown",
+        "title": "anonymous",
+        "createdAt": 1703848404795,
+        "source": "12"
+      },
+      {
+        "id": "6b1ce73f",
+        "value": 30,
+        "type": "add",
+        "sourceId": "5f2293c9",
+        "sourceType": "session",
+        "createdAt": 1703848449618
+      },
+      {
+        "id": "45a29bb8",
+        "value": -10,
+        "sourceId": "9b8dc08b",
+        "sourceType": "session",
+        "title": "123",
+        "createdAt": 1703849221016
+      }
+    ],
+    "assets": 692,
+    "history": [
+      "9ac0e9e3",
+      "825a0fdb",
+      "b8354c00",
+      "d3627640",
+      "3c51e8f0",
+      "b7b141ac",
+      "0a8eee4c",
+      "563254f9",
+      "5904133b",
+      {
+        "sourceId": "a9b2a96d",
+        "updatedAt": 1703842228625,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "a9b2a96d",
+        "updatedAt": 1703842253715,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "5f2293c9",
+        "updatedAt": 1703846122616,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "5f2293c9",
+        "updatedAt": 1703846306276,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "9b8dc08b",
+        "updatedAt": 1703848933132,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "9b8dc08b",
+        "updatedAt": 1703848942025,
+        "sourceType": "session"
+      }
+    ],
+    "blockedAssets": []
+  },
+  {
+    "displayName": "Dmitry Shamak",
+    "email": "dmitry.shamak.dev@gmail.com",
+    "authId": "116068537305458774346",
+    "admin": true,
+    "id": "083b2e1c",
+    "assets": 30,
+    "blockedAssets": [],
+    "transactions": [
+      {
+        "id": "34b5068c",
+        "createdAt": 1703327365548,
+        "value": -20,
+        "source": "Dmitrysh Room 3",
+        "sourceId": "b8354c00"
+      },
+      {
+        "id": "95e95729",
+        "createdAt": 1703327864141,
+        "value": -100,
+        "source": "Dmitrysh Room 4",
+        "sourceId": "d3627640"
+      },
+      {
+        "id": 1703328226134,
+        "createdAt": 1703328226193,
+        "value": 280,
+        "type": "personal transfer"
+      },
+      {
+        "id": "46c92e94",
+        "createdAt": 1703328309295,
+        "value": -20,
+        "source": "SRoom",
+        "sourceId": "3c51e8f0"
+      },
+      {
+        "id": "4bce0bdd",
+        "createdAt": 1703328314381,
+        "value": 60,
+        "source": "SRoom",
+        "sourceId": "3c51e8f0",
+        "sourceType": "session"
+      },
+      {
+        "id": "d894a451",
+        "value": -20,
+        "sourceId": "b7b141ac",
+        "sourceType": "unknown",
+        "title": "anonymous",
+        "createdAt": 1703781602283,
+        "source": "Dmitrysh 1"
+      },
+      {
+        "id": "38d7ef9d",
+        "value": -20,
+        "sourceId": "5f2293c9",
+        "sourceType": "unknown",
+        "title": "anonymous",
+        "createdAt": 1703848404795,
+        "source": "12"
+      },
+      {
+        "id": "7f3f1eb0",
+        "value": -20,
+        "sourceId": "9b8dc08b",
+        "sourceType": "session",
+        "title": "123",
+        "createdAt": 1703849221016
+      },
+      {
+        "id": "eec8dd0c",
+        "value": 30,
+        "type": "add",
+        "sourceId": "9b8dc08b",
+        "sourceType": "session",
+        "title": "123",
+        "createdAt": 1703849685836
+      }
+    ],
+    "history": [
+      "3c51e8f0",
+      "b7b141ac",
+      {
+        "sourceId": "5f2293c9",
+        "updatedAt": 1703846584675,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "9b8dc08b",
+        "updatedAt": 1703849204359,
+        "sourceType": "session"
+      }
+    ]
+  },
+  {
+    "displayName": "Dmitry Lime",
+    "email": "dmitryzlodey@gmail.com",
+    "authId": "102728066060322593478",
+    "id": "58c6ab3c",
+    "history": [
+      {
+        "sourceId": "5904133b",
+        "updatedAt": 1703837522064,
+        "sourceType": "session"
+      },
+      {
+        "sourceId": "5f2293c9",
+        "updatedAt": 1703848384514,
+        "sourceType": "session"
+      }
+    ],
+    "assets": 30,
+    "transactions": [
+      {
+        "id": "6e501263",
+        "value": 30,
+        "type": "add",
+        "sourceId": "5f2293c9",
+        "sourceType": "session",
+        "createdAt": 1703848449618
+      }
+    ]
+  }
+]

@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useReducer, useState } from "react";
 import { Button } from "../button/Button";
 import { ProfileContext } from "./profileContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRepeat, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faRepeat, faSackDollar, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ProfileTransactionForm } from "./ProfileTransactionForm";
 import classNames from "classnames";
 
@@ -57,7 +57,7 @@ export const ProfileAssets: React.FC<{}> = ({}) => {
             color: visible ? "var(--red)" : undefined,
           }}
         >
-          <FontAwesomeIcon icon={visible ? faTimes : faRepeat} />
+          <FontAwesomeIcon icon={visible ? faTimes : faSackDollar} />
         </Button>
         {visible ? (
           <div className="profile-transaction_form-cover">

@@ -19,15 +19,12 @@ export const SessionUsers: React.FC = () => {
     <div className="flex gap-1 justify-center">
       {readyNum ? (
         <>
-          <span className="flex gap-1">
-            <FontAwesomeIcon icon={faCheck} />
-            {readyNum}
-          </span>
-          <span>/</span>
+          <span className="flex gap-1">Ready <b>{readyNum}</b></span>
+          <span>of</span>
         </>
       ) : null}
       <span className="flex gap-1">
-        {total}
+        <b>{total}</b>
         <FontAwesomeIcon icon={faPerson} />
       </span>
     </div>

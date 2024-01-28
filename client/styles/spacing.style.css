@@ -14,10 +14,25 @@
 .p-1 {
   padding: 1em;
 }
+.p-md {
+  padding: 0.5rem;
+}
 .p-small {
   padding: 0.2rem;
 }
 
 .p-0 {
   padding: 0;
+}
+
+
+.mt-1 {
+  margin-top: 1rem;
+}
+.mt {
+  margin-top: 0.5rem;
+}
+
+.mb {
+  margin-bottom: 0.2rem;
 }

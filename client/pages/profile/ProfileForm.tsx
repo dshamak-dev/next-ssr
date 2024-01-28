@@ -1,16 +1,6 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
+import React, { useCallback, useContext } from "react";
 import { useAuth } from "../../modules/auth/useAuth";
-import { getProfile, postProfile } from "../../modules/profile/profile.api";
-import { waitFor } from "../../support/api.model";
-import { Loader } from "../../modules/loader/Loader";
-import { Label } from "../../modules/label/Label";
+import { postProfile } from "../../modules/profile/profile.api";
 import { ProfileContext } from "../../modules/profile/profileContext";
 import { useForm } from "../../modules/form/useForm";
 
@@ -20,17 +10,24 @@ export const ProfileFormPage: React.FC<Props> = ({}) => {
   const { user, authId } = useAuth();
   const [loading, data, logged, dispatch] = useContext(ProfileContext);
 
-  const handleSubmit = useCallback(async (e, formData) => {
-    const profile = Object.assign(formData, { authId });
+  const handleSubmit = useCallback(
+    async (e, formData) => {
+      const profile = Object.assign(formData, { authId });
 
-    console.log(profile);
+      dispatch({ type: "loading", value: true });
 
-    dispatch({ type: "loading", value: true });
+      const response = await postProfile(profile);
 
-    const response = await postProfile(profile);
+      console.log(response);
 
-    dispatch({ type: "data", value: response });
-  }, [authId, dispatch]);
+      if (response) {
+        dispatch({ type: "data", value: response });
+      } else {
+        dispatch({ type: "error", value: "something went wrong. Try again" });
+      }
+    },
+    [authId, dispatch]
+  );
 
   const { element } = useForm({
     initialData: { displayName: user?.displayName, email: user?.email },

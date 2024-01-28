@@ -21,21 +21,24 @@ export const ProfileHistoryPage: React.FC<Props> = ({}) => {
 
   return (
     <div className="flex w-full col gap-1 text-xs p-1">
-      {loadingHistory ? <Loader /> : null}
-      {list.length
-        ? list.map((it) => {
-            const dateLabel = it.updatedAt ? new Date(it.updatedAt).toLocaleDateString() : null
+      {loadingHistory ? (
+        <Loader />
+      ) : list.length ? (
+        list.map((it) => {
+          const dateLabel = it.updatedAt
+            ? new Date(it.updatedAt).toLocaleDateString()
+            : null;
 
-            return (
-              <div key={it.id} className="flex items-center between w-full">
-                <Link href={it.url}>
-                  {it.title || `#${it.id}`}
-                </Link>
-                <span>{dateLabel}</span>
-              </div>
-            );
-          })
-        : "no history"}
+          return (
+            <div key={it.id} className="flex items-center between w-full">
+              <Link href={it.url}>{it.title || `#${it.id}`}</Link>
+              <span>{dateLabel}</span>
+            </div>
+          );
+        })
+      ) : (
+        "no history"
+      )}
     </div>
   );
 };

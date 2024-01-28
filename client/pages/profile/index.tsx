@@ -20,6 +20,7 @@ import {
   IconDefinition,
   faClockRotateLeft,
   faRepeat,
+  faSackDollar,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { ProfileAssets } from "../../modules/profile/ProfileAssets";
@@ -35,7 +36,7 @@ const tabs: { id: tabType; label: string; icon: IconDefinition }[] = [
   {
     id: "transaction",
     label: "profile transactions",
-    icon: faRepeat,
+    icon: faSackDollar,
   },
   {
     id: "history",

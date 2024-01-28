@@ -81,10 +81,11 @@ router.post("/users/:id/transaction", async (req, res) => {
 
 router.post("/users/:id/voucher", async (req, res) => {
   const { id } = req.params;
+  const voucherTag = req.body?.voucher;
 
   const [voucherError, voucher] = await voucherReducer(
     VoucherActionType.Use,
-    { tag: req.body?.voucher },
+    { tag: voucherTag },
     true
   );
 

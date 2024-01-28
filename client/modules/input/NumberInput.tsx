@@ -1,9 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Input, InputProps } from "./Input";
 
 interface Props extends InputProps {}
 
-export const NumberInput: React.FC<Props> = ({ onChange, ...props }) => {
+export const NumberInput: React.FC<Props> = ({ onChange, inputProps, ...props }) => {
   const handleChange = useCallback(
     (e) => {
       if (onChange) {
@@ -14,5 +14,20 @@ export const NumberInput: React.FC<Props> = ({ onChange, ...props }) => {
     [onChange]
   );
 
-  return <Input {...props} onChange={handleChange} type="number" />;
+  const hint = useMemo(() => {
+    const min = inputProps?.min || null;
+    const max = inputProps?.max || null;
+
+    if (min == null && max == null) {
+      return null;
+    }
+    
+    if (min == null) {
+      return `max: ${max}`;
+    }
+
+    return `${min} - ${max}`;
+  }, [inputProps]);
+
+  return <Input {...props} inputProps={inputProps} hint={hint} onChange={handleChange} type="number" />;
 };

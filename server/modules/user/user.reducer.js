@@ -1,6 +1,6 @@
 const { uid } = require("../../scripts/support.js");
 const { Transaction } = require("../transaction/transaction.model.js");
-const { get, update } = require("./user.controller.js");
+const { get, update, updateUserTransactions } = require("./user.controller.js");
 
 const UserActionTypes = {
   BlockAssets: 1,
@@ -15,7 +15,7 @@ const blockUserAssets = async (user, payload) => {
   const value = Number(payload.value) || 0;
 
   if (!value || assets < value) {
-    return ['Not enough assets', user];
+    return ["Not enough assets", user];
   }
 
   const blockedAssets = user.blockedAssets || [];
@@ -47,8 +47,8 @@ const applyUserTransaction = async (user, payload) => {
   const transaction = new Transaction(payload);
   const value = Number(payload.value) || 0;
 
-  if (transaction.type === 'remove' && assets < value ) {
-    return ['Not enough assets', user];
+  if (transaction.type === "remove" && assets < value) {
+    return ["Not enough assets", user];
   }
 
   assets = transaction.apply(assets);
@@ -66,7 +66,7 @@ const applyUserTransaction = async (user, payload) => {
 
 const applyUserVoucher = async (user, voucher) => {
   if (!voucher || !voucher.id) {
-    return ['invalid voucher', user];
+    return ["invalid voucher", user];
   }
 
   const transactions = user.transactions || [];
@@ -140,6 +140,33 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
   }
 
   const handler = userActions[actionType];
+
+  try {
+    switch (actionType) {
+      case UserActionTypes.ApplyVoucher: {
+        const [actionError, actionResult] = await handler(user, payload);
+        const error = actionError;
+
+        if (error || !actionResult) {
+          console.log({ error, actionResult });
+          return [error, actionResult];
+        }
+
+        const { assets, transactions } = actionResult;
+        
+        const updatedUser = await updateUserTransactions(user.id, {
+          assets,
+          transactions,
+        });
+
+        return [error, updatedUser];
+      }
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [err, null];
+  }
 
   if (!handler) {
     return ["permission denied", user];

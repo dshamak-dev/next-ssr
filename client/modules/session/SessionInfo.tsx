@@ -9,7 +9,7 @@ export const SessionInfo = () => {
   return (
     <div>
       <div className="flex col gap-1">
-        <p className="text-base opacity-50 text-center">sit tight, relax and wait</p>
+        <p className="text-base opacity-50 text-center">sit tight, relax and wait for results</p>
       </div>
     </div>
   );

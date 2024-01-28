@@ -1,13 +1,12 @@
-const { Database } = require("../../database/database.controller.js");
 const { uid } = require("../../scripts/support.js");
 
-const _db = new Database("users");
+const _db = require("./user.schema.js");
 
 const get = async ({ authId, id }) => {
   if (id != null) {
-    return _db.find({ id });
+    return _db.findOne({ id });
   } else if (authId != null) {
-    return _db.find({ authId });
+    return _db.findOne({ authId });
   }
 
   return null;
@@ -22,15 +21,31 @@ const post = async (user) => {
 
   record = Object.assign(user, { id: uid() });
 
-  _db.add(record);
+  const res = await _db.create(record);
+
+  return res;
+};
+
+const update = async (id, data) => {
+  const record = await _db.findOneAndUpdate({ id }, { $set: data }, { new: true });
 
   return record;
 };
 
-const update = async (id, data) => {
-  const record = _db.patch({ id }, data);
+const updateUserTransactions = async (id, { assets, transactions }) => {
+  try {
+    const record = await _db.findOneAndUpdate(
+      { id },
+      { $set: { assets, transactions } },
+      { new: true }
+    );
 
-  return record;
+    return record;
+  } catch (err) {
+    console.log(err);
+
+    return null;
+  }
 };
 
 const postHistory = async (id, sessionId) => {
@@ -61,4 +76,5 @@ module.exports = {
   update,
   remove,
   postHistory,
+  updateUserTransactions,
 };

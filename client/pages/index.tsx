@@ -15,18 +15,21 @@ export const IndexPage = () => {
 
   return (
     <main className="flex col gap-3 between">
-      <h1 className="capitalize text-lg">
-        create / join
-        <br />
-        <span className="highlight">Contest</span> &<br />
-        <span className="highlight">become</span> a<br />
-        <span className="highlight">winner</span>
+      <h1
+        className="flex col gap capitalize text-2xl text-center"
+        style={{ marginTop: "15vh" }}
+      >
+        <span className="flex gap justify-center w-full">
+          <span className="highlight">Contest</span> &{" "}
+          <span className="highlight">win</span>
+        </span>
       </h1>
-      <div className="controls flex col gap-1 grow-1">
+      <div className="controls flex items-center col gap-2 grow-1">
         <Button onClick={handleCreateSession} className="uppercase">
-          Create
+          Create Session
         </Button>
-        <PopupButton
+        <div className="logo"></div>
+        {/* <PopupButton
           buttonProps={{ primary: true, className: "uppercase" }}
           onText="cancel"
           offText="join"
@@ -57,7 +60,7 @@ export const IndexPage = () => {
               push(`/session/${session.id}`);
             }}
           />
-        </PopupButton>
+        </PopupButton> */}
       </div>
       <div className="profile-link">
         <Link
@@ -121,6 +124,15 @@ export const IndexPage = () => {
           height: var(--height);
           background-color: var(--red);
           border-radius: var(--height) var(--height) 0 0;
+        }
+
+        .logo {
+          --size: calc(min(50vw, 96px));
+          width: var(--size);
+          height: var(--size);
+          z-index: 0;
+          opacity: 0.3;
+          background: url('/logo.png') center no-repeat;
         }
       `}</style>
     </main>

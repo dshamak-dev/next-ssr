@@ -13,22 +13,28 @@ import { SessionUsers } from "./SessionUsers";
 import { LinkView } from "../link/LinkView";
 
 export const Session = () => {
-  const [loading, data, dispatch, sessionError] = useContext(ContestSessionContext);
+  const [loading, data, dispatch, sessionError] = useContext(
+    ContestSessionContext
+  );
 
   const content = useMemo(() => {
     if (sessionError != null) {
       switch (sessionError.status) {
         case 401: {
-          return <div>
-            <h1>{sessionError.message}</h1>
-            <LinkView href="/profile">create account</LinkView>
-          </div>
+          return (
+            <div>
+              <h1>{sessionError.message}</h1>
+              <LinkView href="/profile">create account</LinkView>
+            </div>
+          );
         }
         case 404: {
-          return <div>
-            <h1>{sessionError.message}</h1>
-            <LinkView href="/">home</LinkView>
-          </div>
+          return (
+            <div>
+              <h1>{sessionError.message}</h1>
+              <LinkView href="/">home</LinkView>
+            </div>
+          );
         }
         default: {
           return <h1>{sessionError.message}</h1>;
@@ -87,19 +93,22 @@ export const Session = () => {
         <div className="session-group">
           <div className="flex col gap-1">
             <div className="flex col gap-1">
-              <LinkView href={`/session/${data.id}`} className="text-base flex gap">
-                <strong>
-                  {data.title} #{data.id}
-                </strong>
+              <LinkView href={`/session/${data.id}`} className="text-base">
+                Join URL <strong>#{data.id}</strong>
               </LinkView>
-              {data.details ? <h3>{data.details}</h3> : null}
+              {data.description ? <p className="text-xs">
+                <label>Details:</label>
+                <h3 className="mt">{data.description}</h3>
+              </p> : null}
             </div>
             <SessionUsers />
             <div>{content}</div>
           </div>
           <SessionAdmin />
         </div>
-      ) : content}
+      ) : (
+        content
+      )}
       <style jsx>{`
         .session-group {
           display: grid;

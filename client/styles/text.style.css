@@ -7,6 +7,9 @@
 }
 
 /* Size */
+.text-2xl {
+  font-size: 2.5rem;
+}
 .text-xl {
   font-size: 2rem;
 }

@@ -40,15 +40,30 @@
   pointer-events: none;
 }
 
-/* Input label */
-.input_container .input-label {
+.input-container[data-hint]:after {
+  content: attr(data-hint);
   position: absolute;
   top: 0;
-  left: 0;
+  right: 1em;
+  font-size: 0.5em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+}
+
+/* Input label */
+.input-label {
+  margin-left: 1rem;
   font-size: 16px;
-  color: rgba(204, 204, 204, 0);
+  color: rgba(104, 104, 104, 1);
   pointer-events: none;
   transition: all 0.3s ease;
+}
+.input-label .required-mark {
+  color: #ff0000;
+  position: relative;
+  top: -1px;
 }
 
 /* Input highlight */

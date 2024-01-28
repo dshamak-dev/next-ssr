@@ -46,6 +46,8 @@
 }
 
 .page .tabs .tab {
+  position: relative;
+  top: -1px;
   width: 3rem;
   height: 3rem;
   display: flex;
@@ -61,7 +63,7 @@
   height: 1rem;
 }
 
-.page .tabs .tab .tab_active {
+.page .tabs .tab.tab_active {
   background: var(--white);
   color: var(--black);
 }

@@ -3,8 +3,8 @@ import { Input } from "../input/Input";
 import { Button } from "../button/Button";
 import { Select } from "../input/Select";
 import { NumberInput } from "../input/NumberInput";
-import { TagInput } from "../input/TagInput";
 import { getFormEntries } from "./form.support";
+import { ListInput } from "../input/ListInput";
 
 export interface FormField {
   type?:
@@ -20,6 +20,7 @@ export interface FormField {
   id: string;
   label?: string;
   placeholder?: string;
+  defaultValue?: string[];
   className?: string;
   inputProps?: Record<string, string | number | boolean | Object>;
   options?: { text: string; value: any }[];
@@ -72,9 +73,10 @@ export const useForm = ({
       {
         id: id,
         name: id,
-        placeholder: `Ender ${label || id}`,
+        placeholder: `Enter ${label || id}`,
         defaultValue: formData ? formData[field.id] || "" : "",
         inputProps,
+        label,
         onChange: (e) => handleFieldChange(id, e.target.value),
       },
       props
@@ -88,7 +90,7 @@ export const useForm = ({
         return <Select key={id} {...commonProps} options={options} />;
       }
       case "list": {
-        return <TagInput key={id} {...commonProps} />;
+        return <ListInput key={id} {...commonProps} />;
       }
       default: {
         return <Input key={id} {...commonProps} />;
@@ -98,9 +100,11 @@ export const useForm = ({
 
   const element = useMemo(() => {
     return (
-      <form onSubmit={handleSubmit} className="flex col gap-1">
+      <form onSubmit={handleSubmit} className="flex col gap">
         {fields.map(renderInput)}
-        <Button secondary>Submit</Button>
+        <div className="mt-1">
+          <Button secondary>Submit</Button>
+        </div>
       </form>
     );
   }, [fields, handleSubmit]);
