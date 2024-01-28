@@ -6,16 +6,19 @@ const userRouter = require("./modules/user/user.router.js");
 const sessionRouter = require("./modules/session/session.router.js");
 const voucherRouter = require("./modules/voucher/voucher.router.js");
 
-const { connect } = require('mongoose');
+const { connect } = require("mongoose");
 
-require('dotenv').config();
+require("dotenv").config();
 
 const dbUri = process.env.DB_URI;
 
+let dbClient;
+
 try {
-  const dbClient = connect(dbUri, {autoCreate: true });
-  console.log('bd connected');
+  dbClient = connect(dbUri, { autoCreate: true });
+  console.log("bd connected");
 } catch (err) {
+  dbClient = null;
   console.error(err);
 }
 
@@ -44,7 +47,11 @@ app.use("/api", sessionRouter);
 app.use("/api", voucherRouter);
 
 app.get("*", async (req, res) => {
-  res.status(200).end("hi!");
+  let message = "";
+
+  message = dbClient != null ? "connected" : "-_-";
+
+  res.status(200).end(message);
 });
 
 app.listen(PORT, () => {
