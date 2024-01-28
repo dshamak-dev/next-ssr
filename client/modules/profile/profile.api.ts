@@ -4,6 +4,10 @@ export const getProfile = async (id) => {
   return appApi.get(`/users?authId=${id}`);
 };
 
+export const postAuth = (body) => {
+  return appApi.post("auth", { json: true, body });
+};
+
 export const postProfile = (body) => {
   return appApi.post("users", { json: true, body });
 };

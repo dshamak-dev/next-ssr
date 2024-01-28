@@ -18,8 +18,6 @@ export const ProfileFormPage: React.FC<Props> = ({}) => {
 
       const response = await postProfile(profile);
 
-      console.log(response);
-
       if (response) {
         dispatch({ type: "data", value: response });
       } else {

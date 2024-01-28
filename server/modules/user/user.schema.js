@@ -1,30 +1,10 @@
 const { Schema, model } = require("mongoose");
 
-const transactionFields = {
-  id: String,
-  value: Number,
-  type: String,
-  sourceId: String,
-  sourceType: String,
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
-  },
-};
-
-const historyFields = {
-  sourceId: String,
-  sourceType: String,
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
-  },
-};
-
 const _schema = new Schema({
   id: String,
   displayName: String,
   email: String,
+  password: String,
   createdAt: {
     type: Date,
     default: () => Date.now(),

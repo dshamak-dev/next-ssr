@@ -2,13 +2,13 @@ const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
 
+require("dotenv").config();
+
 const userRouter = require("./modules/user/user.router.js");
 const sessionRouter = require("./modules/session/session.router.js");
 const voucherRouter = require("./modules/voucher/voucher.router.js");
 
 const { connect } = require("mongoose");
-
-require("dotenv").config();
 
 const dbUri = process.env.DB_URI;
 
@@ -21,8 +21,6 @@ try {
   dbClient = null;
   console.error(err);
 }
-
-const API_DOMAIN = process.env.API_DOMAIN;
 const clientPort = 3000;
 
 const PORT = process.env.PORT || clientPort + 1;

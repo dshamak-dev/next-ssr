@@ -6,8 +6,46 @@ const {
   reducer: voucherReducer,
   VoucherActionType,
 } = require("../voucher/voucher.reducer.js");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
+
+router.post("/auth", async (req, res) => {
+  const { email, password, csrfToken } = req.body;
+
+  if (!email || !password) {
+    console.log({ email, password });
+    return res.status(400).json(null).end();
+  }
+
+  let user = await get({ email });
+
+  if (!user) {
+    console.log('create', { email, password });
+    user = await post({
+      email,
+      password,
+      authId: email,
+    });
+  } else if (user.password !== password) {
+    console.log('invalid', { user, password });
+    return res.status(400).json(null).end();
+  }
+
+  const { authId, id } = user;
+
+  const tokenData = { email, authId, id };
+
+  const accessToken = jwt.sign(tokenData, csrfToken);
+
+  console.log('return', tokenData);
+
+  res
+    .setHeader("Authorization", `Bearer ${accessToken}`)
+    .status(200)
+    .json(tokenData)
+    .end();
+});
 
 router.get("/users", async (req, res) => {
   const { authId, id } = req.query;
