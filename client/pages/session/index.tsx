@@ -42,9 +42,12 @@ export const SessionFormPage = () => {
       }
 
       const { options, ...fields } = formData;
-      const optionsNum = options?.length || 0;
 
-      if (optionsNum < 1) {
+      const normalizedOptions =
+        formData.options?.filter((it) => !!it?.length) || [];
+      const optionsNum = normalizedOptions.length || 0;
+
+      if (optionsNum < 2) {
         show("At least two options required");
         return;
       }
@@ -54,7 +57,7 @@ export const SessionFormPage = () => {
       const data = Object.assign(
         {
           ownerId: profile.id,
-          options: options.map((text, index) => {
+          options: normalizedOptions.map((text, index) => {
             return { text, id: index + 1 };
           }),
         },
