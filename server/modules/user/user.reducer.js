@@ -51,7 +51,7 @@ const applyUserTransaction = async (user, payload) => {
     return ["Not enough assets", user];
   }
 
-  assets = transaction.apply(assets);
+  assets = transaction.applyTo(assets);
 
   transactions.push(transaction);
 
@@ -143,7 +143,8 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
 
   try {
     switch (actionType) {
-      case UserActionTypes.ApplyVoucher: {
+      case UserActionTypes.ApplyVoucher:
+      case UserActionTypes.ApplyTransaction: {
         const [actionError, actionResult] = await handler(user, payload);
         const error = actionError;
 

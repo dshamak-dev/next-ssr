@@ -125,6 +125,25 @@ router.post("/users/:id/transaction", async (req, res) => {
   res.status(200).json(record);
 });
 
+router.post("/users/:id/blockassets", async (req, res) => {
+  const { id } = req.params;
+  const { value, title, sourceType, sourceId } = req.body;
+
+  const [error, user] = await reducer(
+    id,
+    UserActionTypes.BlockAssets,
+    {value, title, sourceType, sourceId}
+  );
+
+  if (error) {
+    return res.status(400).json({ error: error });
+  }
+
+  const record = await update(id, Object.assign({}, user));
+
+  res.status(200).json(record);
+});
+
 router.post("/users/:id/voucher", async (req, res) => {
   const { id } = req.params;
   const voucherTag = req.body?.voucher;

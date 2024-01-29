@@ -21,7 +21,7 @@ class Transaction {
     }
   }
 
-  apply(target) {
+  applyTo(target) {
     const value = Number(this.value);
 
     switch (this.type) {

@@ -1,0 +1,25 @@
+GET http://localhost:3001/api/users/1e841262
+
+###
+
+POST http://localhost:3001/api/users/1e841262/transaction
+Content-Type: application/json
+
+{
+  "value": 10,
+  "sourceId": null,
+  "type": "add",
+  "title": "test"
+}
+
+###
+
+POST http://localhost:3001/api/users/1e841262/blockassets
+Content-Type: application/json
+
+{
+  "value": 2,
+  "sourceId": "1",
+  "sourceType": "test",
+  "title": "test"
+}

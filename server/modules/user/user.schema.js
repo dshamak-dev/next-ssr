@@ -23,6 +23,10 @@ const _schema = new Schema({
     type: [Object],
     default: [],
   },
+  blockedAssets: {
+    type: [Object],
+    default: [],
+  }
 });
 
 module.exports = model("User", _schema);
