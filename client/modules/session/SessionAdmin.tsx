@@ -21,7 +21,7 @@ export const SessionAdmin = () => {
 
   const handleLock = async () => {
     const state = await lockSession(data.id, profile.id).catch((err) => {
-      show(err.message);
+      show('error', err.message);
     });
 
     if (state && !state.error) {
@@ -33,7 +33,7 @@ export const SessionAdmin = () => {
     const state = await resolveSession(data.id, profile.id, {
       options: [optionId],
     }).catch((err) => {
-      show(err.message);
+      show('error', err.message);
     });
 
     if (state && !state.error) {

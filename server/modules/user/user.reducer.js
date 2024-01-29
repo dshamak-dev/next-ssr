@@ -146,7 +146,6 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
         const error = actionError;
 
         if (error || !actionResult) {
-          console.log({ error, actionResult });
           return [error, actionResult];
         }
 
@@ -161,8 +160,6 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
       }
     }
   } catch (err) {
-    console.log(err);
-
     return [err, null];
   }
 

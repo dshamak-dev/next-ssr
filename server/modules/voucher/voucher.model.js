@@ -22,6 +22,8 @@ class Voucher {
       props
     );
 
+    this.tag = this.tag?.toLowerCase();
+
     if (this.id == null) {
       this.id = uid();
     }

@@ -46,7 +46,7 @@ export const ProfileTransactionForm: React.FC<Props> = ({ onClose }) => {
     async (e, { voucher }) => {
       const response = await useProfileVoucher(profile?.id, voucher)
         .catch((error) => {
-          show(error.message);
+          show('warning', error.message);
 
           return null;
         });

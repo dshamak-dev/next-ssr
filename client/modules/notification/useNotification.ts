@@ -1,18 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { dispatchNotificationEvent } from "./NotificationContext";
-import { INotification } from "./notification.model";
+import { ToasterType, showToaster } from "./NotificationProvider";
 
 export const useNotification = () => {
-  const handleShow = useCallback((payload: string | INotification) => {
-    const notification =
-      typeof payload === "string"
-        ? {
-            text: payload,
-          }
-        : payload;
-
-    dispatchNotificationEvent(notification);
+  const handleShow = useCallback((type: ToasterType, content, props = null) => {
+    showToaster(type, content, props);
   }, []);
+
   const handleClose = useCallback(() => {}, []);
 
   const controls = useMemo(() => {

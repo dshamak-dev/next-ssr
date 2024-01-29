@@ -48,7 +48,7 @@ export const SessionFormPage = () => {
       const optionsNum = normalizedOptions.length || 0;
 
       if (optionsNum < 2) {
-        show("At least two options required");
+        show('warning', "At least 2 Answer variants required");
         return;
       }
 

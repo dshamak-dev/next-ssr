@@ -18,7 +18,7 @@ const createVoucher = async (payload) => {
     return Promise.reject(error);
   }
 
-  const voucher = await find({ tag: payload?.tag });
+  const voucher = await find({ tag: payload?.tag?.toLowerCase() });
 
   if (voucher) {
     error = 'this tag already used';
@@ -29,7 +29,7 @@ const createVoucher = async (payload) => {
   return new Voucher(payload);
 };
 const useVoucher = async (payload) => {
-  const voucher = await find({ tag: payload?.tag });
+  const voucher = await find({ tag: payload?.tag?.toLowerCase() });
   let error = null;
 
   // todo: check expire date and active state

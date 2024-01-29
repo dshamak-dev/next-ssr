@@ -25,24 +25,27 @@ export const VoucherAdminSection: React.FC<Props> = ({}) => {
   ] = useApi(async () => getVouchers(profile?.id), [], profile?.id != null);
   const { show } = useNotification();
 
-  const handleAddVoucher = useCallback(async (e, formData) => {
-    const event = new CustomEvent(closePopupEventName, {
-      bubbles: true,
-      detail: {},
-    });
+  const handleAddVoucher = useCallback(
+    async (e, formData) => {
+      const event = new CustomEvent(closePopupEventName, {
+        bubbles: true,
+        detail: {},
+      });
 
-    const voucher = await postVoucher(profile?.id, formData).catch(
-      (err) => null
-    );
+      const voucher = await postVoucher(profile?.id, formData).catch(
+        (err) => null
+      );
 
-    if (voucher) {
-      setVouchers([...vouchers, voucher]);
+      if (voucher) {
+        setVouchers([...vouchers, voucher]);
 
-      e.target.dispatchEvent(event);
-    } else {
-      show({ text: `Can't create voucher. Try again!` });
-    }
-  }, [vouchers]);
+        e.target.dispatchEvent(event);
+      } else {
+        show("warning", `Can't create voucher. Try again!`);
+      }
+    },
+    [vouchers]
+  );
 
   return (
     <div className="flex col gap-2">

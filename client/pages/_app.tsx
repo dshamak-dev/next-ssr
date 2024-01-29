@@ -10,7 +10,7 @@ dom.watch();
 
 import "../styles/global.style.css";
 import { ProfileProvider } from "../modules/profile/profileContext";
-import { NotificationProvider } from "../modules/notification/NotificationContext";
+import { NotificationProvider } from "../modules/notification/NotificationProvider";
 
 export default function MyApp({
   Component,
