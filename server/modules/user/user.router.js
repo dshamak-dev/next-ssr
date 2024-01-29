@@ -7,6 +7,7 @@ const {
   VoucherActionType,
 } = require("../voucher/voucher.reducer.js");
 const jwt = require("jsonwebtoken");
+const { joinMongoRecords } = require("../../scripts/support.js");
 
 const router = express.Router();
 
@@ -14,7 +15,6 @@ router.post("/auth", async (req, res) => {
   const { email, password, csrfToken } = req.body;
 
   if (!email || !password) {
-    console.log({ email, password });
     return res.status(400).json(null).end();
   }
 
@@ -29,14 +29,13 @@ router.post("/auth", async (req, res) => {
   }
 
   if (!user) {
-    console.log('create', { email, password });
     user = await post({
       email,
       password,
       authId: email,
     });
   } else if (user.password !== password) {
-    console.log('invalid', { user, password });
+    console.log("invalid", { user, password });
     return res.status(400).json(null).end();
   }
 
@@ -45,8 +44,6 @@ router.post("/auth", async (req, res) => {
   const tokenData = { email, authId, id };
 
   const accessToken = jwt.sign(tokenData, csrfToken);
-
-  console.log('return', tokenData);
 
   res
     .setHeader("Authorization", `Bearer ${accessToken}`)
@@ -83,13 +80,12 @@ router.get("/users/:id", async (req, res) => {
         return prev + value;
       }, 0);
 
-  const user = Object.assign(
-    {
-      assets: assets - blockedValue,
-    },
+  const normalizedAssets = Number(assets) - Number(blockedValue);
+
+  const user = joinMongoRecords(other, {
+    assets: normalizedAssets,
     blockedAssets,
-    other
-  );
+  });
 
   res.status(200).json(user);
 });
@@ -129,19 +125,34 @@ router.post("/users/:id/blockassets", async (req, res) => {
   const { id } = req.params;
   const { value, title, sourceType, sourceId } = req.body;
 
+  const [error, user] = await reducer(id, UserActionTypes.BlockAssets, {
+    value,
+    title,
+    sourceType,
+    sourceId,
+  });
+
+  if (error) {
+    return res.status(400).json({ error: error });
+  }
+
+  res.status(200).json(user);
+});
+router.post("/users/:id/resolveassets", async (req, res) => {
+  const { id } = req.params;
+  const { sourceId, revert = false } = req.body;
+
   const [error, user] = await reducer(
     id,
-    UserActionTypes.BlockAssets,
-    {value, title, sourceType, sourceId}
+    UserActionTypes.ResolveBlockedAssets,
+    { sourceId, revert }
   );
 
   if (error) {
     return res.status(400).json({ error: error });
   }
 
-  const record = await update(id, Object.assign({}, user));
-
-  res.status(200).json(record);
+  res.status(200).json(user);
 });
 
 router.post("/users/:id/voucher", async (req, res) => {

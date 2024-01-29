@@ -1,15 +1,21 @@
-const { uid } = require("../../scripts/support.js");
+const { uid, joinMongoRecords } = require("../../scripts/support.js");
 
 const _db = require("./user.schema.js");
 
 const get = async ({ authId, id }) => {
+  let user = null;
+
   if (id != null) {
-    return _db.findOne({ id });
+    user = await _db.findOne({ id });
   } else if (authId != null) {
-    return _db.findOne({ authId });
+    user = await _db.findOne({ authId });
   }
 
-  return null;
+  if (!user) {
+    return null;
+  }
+
+  return user;
 };
 
 const post = async (user) => {
@@ -19,7 +25,7 @@ const post = async (user) => {
     return record;
   }
 
-  record = Object.assign(user, { id: uid() });
+  record = joinMongoRecords(user, { id: uid() });
 
   const res = await _db.create(record);
 

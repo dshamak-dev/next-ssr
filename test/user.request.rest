@@ -1,6 +1,6 @@
 GET http://localhost:3001/api/users/1e841262
 
-###
+### topup assets
 
 POST http://localhost:3001/api/users/1e841262/transaction
 Content-Type: application/json
@@ -12,7 +12,7 @@ Content-Type: application/json
   "title": "test"
 }
 
-###
+### add assets blocker
 
 POST http://localhost:3001/api/users/1e841262/blockassets
 Content-Type: application/json
@@ -22,4 +22,24 @@ Content-Type: application/json
   "sourceId": "1",
   "sourceType": "test",
   "title": "test"
+}
+
+### confirm asset blocker
+
+POST http://localhost:3001/api/users/1e841262/resolveassets
+Content-Type: application/json
+
+{
+  "sourceId": "1",
+  "revert": false
+}
+
+### revert asset blocker
+
+POST http://localhost:3001/api/users/1e841262/resolveassets
+Content-Type: application/json
+
+{
+  "sourceId": "1",
+  "revert": true
 }

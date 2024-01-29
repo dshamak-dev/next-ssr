@@ -1,4 +1,4 @@
-const { uid } = require("../../scripts/support.js");
+const { uid, joinMongoRecords } = require("../../scripts/support.js");
 const { Transaction } = require("../transaction/transaction.model.js");
 const { get, update, updateUserTransactions } = require("./user.controller.js");
 
@@ -25,6 +25,7 @@ const blockUserAssets = async (user, payload) => {
   blockedAssets.push(
     Object.assign(
       {
+        sourceType: "blocked",
         createdAt: Date.now(),
       },
       payload
@@ -33,7 +34,7 @@ const blockUserAssets = async (user, payload) => {
 
   return [
     null,
-    Object.assign({}, user, {
+    joinMongoRecords({}, user, {
       assets,
       blockedAssets,
     }),
@@ -55,13 +56,7 @@ const applyUserTransaction = async (user, payload) => {
 
   transactions.push(transaction);
 
-  return [
-    null,
-    Object.assign({}, user, {
-      assets,
-      transactions,
-    }),
-  ];
+  return [null, joinMongoRecords({}, user, { assets, transactions })];
 };
 
 const applyUserVoucher = async (user, voucher) => {
@@ -95,7 +90,7 @@ const userActions = {
 
     const blockedAssets = user.blockedAssets || [];
     const blockedRecordIndex = blockedAssets.findIndex(
-      (it) => it.sourceId === sourceId
+      (it) => it.sourceId == sourceId
     );
 
     if (blockedRecordIndex === -1) {
@@ -103,17 +98,19 @@ const userActions = {
     }
 
     let error = null;
-    let nextUser = Object.assign({}, user);
+    let nextUser = user;
 
     const { id, ...blockedRecord } = blockedAssets.splice(
       blockedRecordIndex,
       1
     )[0];
 
-    if (!revert) {
+    if (revert) {
       const transaction = {
         ...blockedRecord,
-        value: Number(blockedRecord.value) * -1,
+        type: "add",
+        sourceType: "refund",
+        value: Number(blockedRecord.value),
       };
 
       const [_err, _user] = await applyUserTransaction(nextUser, transaction);
@@ -154,7 +151,7 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
         }
 
         const { assets, transactions } = actionResult;
-        
+
         const updatedUser = await updateUserTransactions(user.id, {
           assets,
           transactions,
@@ -182,7 +179,10 @@ const reducer = async (userId, actionType, payload, saveChanges = true) => {
     updatedUser = actionResult;
 
     if (!error && saveChanges) {
-      updatedUser = await update(user.id, Object.assign({}, user, updatedUser));
+      updatedUser = await update(
+        user.id,
+        joinMongoRecords({}, user, actionResult)
+      );
     }
   } catch (err) {
     error = err.message;

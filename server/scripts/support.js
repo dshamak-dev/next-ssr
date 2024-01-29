@@ -24,8 +24,29 @@ const reduceRecord = (record, keys) => {
   }, {});
 };
 
+const normalizeMongoRecord = (record) => {
+  const res = Object.assign({}, record);
+
+  if (res._doc) {
+    return res._doc;
+  }
+
+  return res;
+};
+
+const joinMongoRecords = (...arguments) => {
+  const res = Object.assign(
+    {},
+    ...arguments.map((it) => normalizeMongoRecord(it))
+  );
+
+  return res;
+};
+
 module.exports = {
   uid,
   uidV4,
   reduceRecord,
+  joinMongoRecords,
+  normalizeMongoRecord,
 };
